@@ -1,0 +1,26 @@
+# WordPress config file (contains sensitive data)
+wp-config.php
+
+# Debug log
+debug.log
+
+# Uploads directory (optional - uncomment if needed)
+# wp-content/uploads/
+
+# Cache
+wp-content/cache/
+
+# Backup files
+*.bak
+*.backup
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+.claude/
