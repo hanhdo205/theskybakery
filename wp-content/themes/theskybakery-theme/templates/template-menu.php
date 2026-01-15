@@ -74,80 +74,71 @@ get_header();
 
             <!-- Products Grid -->
             <div class="col-lg-9">
-                <div class="menu-products">
-                    <?php if (class_exists('WooCommerce')) : ?>
-                        <div class="products-grid menu-grid">
-                            <?php
-                            $paged = get_query_var('paged') ? get_query_var('paged') : 1;
-                            $args = array(
-                                'post_type'      => 'product',
-                                'posts_per_page' => 24,
-                                'paged'          => $paged,
-                                'orderby'        => 'title',
-                                'order'          => 'ASC',
-                            );
+                <?php if (class_exists('WooCommerce')) : ?>
 
-                            $products = new WP_Query($args);
+                    <?php
+                    $paged = get_query_var('paged') ? get_query_var('paged') : 1;
+                    $args = array(
+                        'post_type'      => 'product',
+                        'posts_per_page' => 24,
+                        'paged'          => $paged,
+                        'orderby'        => 'title',
+                        'order'          => 'ASC',
+                    );
 
-                            if ($products->have_posts()) :
-                                while ($products->have_posts()) : $products->the_post();
-                                    global $product;
-                            ?>
-                                <div class="product-card menu-product">
-                                    <div class="product-image">
-                                        <a href="<?php the_permalink(); ?>">
-                                            <?php if (has_post_thumbnail()) : ?>
-                                                <?php the_post_thumbnail('tsb-product-thumb'); ?>
-                                            <?php else : ?>
-                                                <img src="<?php echo wc_placeholder_img_src('tsb-product-thumb'); ?>" alt="<?php the_title_attribute(); ?>">
-                                            <?php endif; ?>
-                                        </a>
-                                        
-                                        <?php if ($product->is_on_sale()) : ?>
-                                            <span class="sale-badge">Sale!</span>
-                                        <?php endif; ?>
-                                    </div>
-                                    
-                                    <div class="product-info">
-                                        <h3 class="product-title">
-                                            <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-                                        </h3>
-                                        <div class="product-price">
-                                            <?php echo $product->get_price_html(); ?>
-                                        </div>
-                                        <?php if ($product->get_short_description()) : ?>
-                                            <div class="product-description">
-                                                <?php echo wp_trim_words($product->get_short_description(), 15); ?>
-                                            </div>
-                                        <?php endif; ?>
-                                        <a href="<?php echo esc_url($product->add_to_cart_url()); ?>" class="btn btn-add-cart" data-product_id="<?php echo esc_attr($product->get_id()); ?>">
-                                            Add to cart
-                                        </a>
-                                    </div>
-                                </div>
+                    $products = new WP_Query($args);
+
+                    if ($products->have_posts()) :
+                    ?>
+
+                    <div class="shop-toolbar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;">
+                        <div class="result-count" style="color: #666;">
                             <?php
-                                endwhile;
-                            endif;
+                            $total = $products->found_posts;
+                            $per_page = $products->query_vars['posts_per_page'];
+                            $current = max(1, $paged);
+                            $from = (($current - 1) * $per_page) + 1;
+                            $to = min($total, $current * $per_page);
+                            printf('Showing %d–%d of %d results', $from, $to, $total);
                             ?>
                         </div>
+                    </div>
 
-                        <!-- Pagination -->
-                        <?php if ($products->max_num_pages > 1) : ?>
-                            <nav class="products-pagination">
-                                <?php
-                                echo paginate_links(array(
-                                    'total'     => $products->max_num_pages,
-                                    'current'   => $paged,
-                                    'prev_text' => '<i class="fas fa-chevron-left"></i>',
-                                    'next_text' => '<i class="fas fa-chevron-right"></i>',
-                                ));
-                                ?>
-                            </nav>
-                        <?php endif; ?>
+                    <ul class="products columns-3">
+                        <?php
+                        while ($products->have_posts()) : $products->the_post();
+                            wc_get_template_part('content', 'product');
+                        endwhile;
+                        ?>
+                    </ul>
 
-                        <?php wp_reset_postdata(); ?>
+                    <!-- Pagination -->
+                    <?php if ($products->max_num_pages > 1) : ?>
+                        <div class="pagination-wrap" style="margin-top: 40px;">
+                            <?php
+                            echo paginate_links(array(
+                                'total'     => $products->max_num_pages,
+                                'current'   => $paged,
+                                'prev_text' => '&larr;',
+                                'next_text' => '&rarr;',
+                            ));
+                            ?>
+                        </div>
                     <?php endif; ?>
-                </div>
+
+                    <?php else : ?>
+
+                        <div class="no-products" style="text-align: center; padding: 60px 20px;">
+                            <i class="fas fa-birthday-cake" style="font-size: 60px; color: #ddd; margin-bottom: 20px;"></i>
+                            <h3 style="font-family: var(--font-heading); margin-bottom: 10px;">No products found</h3>
+                            <p style="color: #666;">Sorry, we couldn't find any products.</p>
+                        </div>
+
+                    <?php endif; ?>
+
+                    <?php wp_reset_postdata(); ?>
+
+                <?php endif; ?>
             </div>
         </div>
     </div>

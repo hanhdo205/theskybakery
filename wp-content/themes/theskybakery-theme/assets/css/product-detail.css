@@ -390,23 +390,28 @@
 /* ==================================================
    RELATED PRODUCTS
    ================================================== */
+/* IMPORTANT: Section itself is NOT grid */
+section.related.products,
 .related.products {
     margin-top: 80px;
     padding: 60px 0;
-    background: linear-gradient(135deg, #fff5e6 0%, #ffe8cc 100%);
-    border-radius: 20px;
+    display: block !important; /* Force block layout */
 }
 
-.related.products h2 {
+section.related.products > h2,
+.related.products > h2 {
     font-family: 'Bebas Neue', sans-serif !important;
     font-size: 42px !important;
     color: #333 !important;
     text-align: center !important;
     margin-bottom: 40px !important;
     position: relative;
+    display: block !important;
+    width: 100% !important;
 }
 
-.related.products h2:after {
+section.related.products > h2:after,
+.related.products > h2:after {
     content: '';
     display: block;
     width: 100px;
@@ -416,10 +421,274 @@
     border-radius: 2px;
 }
 
-.related.products .products {
+/* ONLY the UL.products list should be grid (4 columns) */
+section.related.products ul.products,
+.related.products ul.products {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 20px !important;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Make related products smaller and compact */
+section.related.products .product-card-inner,
+.related.products .product-card-inner {
+    font-size: 0.85em;
+}
+
+section.related.products .product-thumb img,
+.related.products .product-thumb img {
+    height: 180px !important;
+}
+
+section.related.products .product-info,
+.related.products .product-info {
+    padding: 12px !important;
+}
+
+section.related.products .product-category,
+.related.products .product-category {
+    font-size: 10px !important;
+    margin-bottom: 5px !important;
+}
+
+section.related.products .product-title,
+.related.products .product-title {
+    font-size: 0.95rem !important;
+    margin: 5px 0 8px 0 !important;
+    line-height: 1.3;
+}
+
+section.related.products .product-price,
+.related.products .product-price {
+    font-size: 1rem !important;
+    margin-bottom: 8px !important;
+}
+
+section.related.products .product-overlay .button,
+.related.products .product-overlay .button {
+    padding: 8px 15px !important;
+    font-size: 13px !important;
+}
+
+section.related.products ul.products li,
+.related.products .products li,
+.shop-page .products li,
+.woocommerce-page .products li,
+.archive .products li,
+ul.products li {
+    list-style: none !important;
+    list-style-type: none !important;
+}
+
+/* Shop Page Products Grid - EXCLUDE related products */
+.shop-page .products,
+.woocommerce-page .products,
+.archive .products,
+.products-grid {
     display: grid !important;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 30px;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* General ul.products in shop/archive pages */
+.shop-page ul.products,
+.woocommerce-page ul.products,
+.archive ul.products,
+.tax-product_cat ul.products {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 30px;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Override grid columns for menu page */
+.menu-page .products,
+.menu-page ul.products {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 25px !important;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* For any products list items */
+.products li,
+.products-grid li {
+    list-style: none !important;
+    list-style-type: none !important;
+}
+
+/* Product Card Styling for Related Products, Shop Page, Category Pages, and All Pages */
+.related.products .product-card .product-info,
+.shop-page .product-card .product-info,
+.woocommerce-page .product-card .product-info,
+.archive .product-card .product-info,
+.page .product-card .product-info,
+.products-grid .product-card .product-info {
+    position: static !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    background: transparent !important;
+    padding: 20px !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+.related.products .product-card .product-category,
+.shop-page .product-card .product-category,
+.woocommerce-page .product-card .product-category,
+.archive .product-card .product-category,
+.page .product-card .product-category,
+.products-grid .product-card .product-category {
+    color: #ff9933 !important;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.related.products .product-card .product-title,
+.shop-page .product-card .product-title,
+.woocommerce-page .product-card .product-title,
+.archive .product-card .product-title,
+.page .product-card .product-title,
+.products-grid .product-card .product-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    margin: 8px 0 10px;
+}
+
+.related.products .product-card .product-title a,
+.shop-page .product-card .product-title a,
+.woocommerce-page .product-card .product-title a,
+.archive .product-card .product-title a,
+.page .product-card .product-title a,
+.products-grid .product-card .product-title a {
+    color: #333;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.related.products .product-card .product-title a:hover,
+.shop-page .product-card .product-title a:hover,
+.woocommerce-page .product-card .product-title a:hover,
+.archive .product-card .product-title a:hover,
+.page .product-card .product-title a:hover,
+.products-grid .product-card .product-title a:hover {
+    color: #ff9933;
+}
+
+.related.products .product-card .product-price,
+.shop-page .product-card .product-price,
+.woocommerce-page .product-card .product-price,
+.archive .product-card .product-price,
+.page .product-card .product-price,
+.products-grid .product-card .product-price {
+    font-weight: 600;
+    color: #ff9933;
+    font-size: 1.1rem;
+    position: static !important;
+    background: none !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+.related.products .product-card .product-price .amount,
+.shop-page .product-card .product-price .amount,
+.woocommerce-page .product-card .product-price .amount,
+.archive .product-card .product-price .amount,
+.page .product-card .product-price .amount,
+.products-grid .product-card .product-price .amount {
+    color: #ff9933;
+    font-weight: 700;
+}
+
+/* Product Card - Additional Styles from content-product.php */
+.product-card-inner {
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.product-card-inner:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+.product-thumb {
+    position: relative;
+    overflow: hidden;
+}
+
+.product-thumb img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.product-card-inner:hover .product-thumb img {
+    transform: scale(1.05);
+}
+
+.sale-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: #e74c3c;
+    color: #fff;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 2;
+}
+
+.product-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 15px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.7));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.product-card-inner:hover .product-overlay {
+    opacity: 1;
+}
+
+.product-overlay .button,
+.product-overlay .add_to_cart_button {
+    display: block;
+    width: 100%;
+    background: #ff9933 !important;
+    color: #fff !important;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.product-overlay .button:hover,
+.product-overlay .add_to_cart_button:hover {
+    background: #ff6600 !important;
 }
 
 /* ==================================================
@@ -866,6 +1135,149 @@
 }
 
 /* ==================================================
+   MENU PAGE STYLES
+   ================================================== */
+.menu-page {
+    background: #f9f9f9;
+    padding-bottom: 60px;
+}
+
+.menu-page .page-header {
+    background: linear-gradient(135deg, #ff9933 0%, #ff6600 100%);
+    padding: 60px 0;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.menu-page .page-header .page-title {
+    color: #fff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    margin: 0;
+}
+
+/* Menu Sidebar */
+.menu-sidebar {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+    position: sticky;
+    top: 100px;
+}
+
+.menu-sidebar .categories-list h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ff9933;
+}
+
+.menu-sidebar .category-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu-sidebar .category-item {
+    margin-bottom: 10px;
+}
+
+.menu-sidebar .category-item > a {
+    display: block;
+    color: #333;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    transition: all 0.3s;
+    font-weight: 600;
+}
+
+.menu-sidebar .category-item > a:hover {
+    background: #fff5e6;
+    color: #ff9933;
+    padding-left: 20px;
+}
+
+.menu-sidebar .subcategory-menu {
+    list-style: none;
+    padding-left: 20px;
+    margin-top: 8px;
+}
+
+.menu-sidebar .subcategory-menu li {
+    margin-bottom: 5px;
+}
+
+.menu-sidebar .subcategory-menu a {
+    color: #666;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s;
+}
+
+.menu-sidebar .subcategory-menu a:hover {
+    color: #ff9933;
+}
+
+/* Pagination Styling */
+.pagination-wrap,
+.woocommerce-pagination {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.pagination-wrap .page-numbers,
+.woocommerce-pagination .page-numbers {
+    display: inline-block;
+    padding: 10px 15px;
+    margin: 0 5px;
+    background: #fff;
+    color: #333;
+    text-decoration: none;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    transition: all 0.3s;
+}
+
+.pagination-wrap .page-numbers:hover,
+.pagination-wrap .page-numbers.current,
+.woocommerce-pagination .page-numbers:hover,
+.woocommerce-pagination .page-numbers.current {
+    background: #ff9933;
+    color: #fff;
+    border-color: #ff9933;
+}
+
+/* Responsive for Menu Page */
+@media (max-width: 992px) {
+    .menu-page .products,
+    .menu-page ul.products {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 20px !important;
+    }
+
+    .menu-sidebar {
+        margin-bottom: 30px;
+        position: static;
+    }
+}
+
+@media (max-width: 576px) {
+    .menu-page .products,
+    .menu-page ul.products {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+    }
+
+    .menu-page .page-header .page-title {
+        font-size: 2rem;
+    }
+}
+
+/* ==================================================
    RESPONSIVE DESIGN
    ================================================== */
 @media (max-width: 991px) {
@@ -906,16 +1318,31 @@
         margin-bottom: 5px;
     }
 
-    .related.products .products {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
+    section.related.products ul.products,
+    .related.products ul.products {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 20px !important;
+    }
+
+    /* Ensure section stays block on tablet */
+    section.related.products,
+    .related.products {
+        display: block !important;
     }
 }
 
 @media (max-width: 480px) {
-    .related.products .products {
-        grid-template-columns: 1fr;
+    section.related.products ul.products,
+    .related.products ul.products {
+        grid-template-columns: 1fr !important;
     }
+
+    /* Ensure section stays block on mobile */
+    section.related.products,
+    .related.products {
+        display: block !important;
+    }
+}
 
     .single_add_to_cart_button {
         width: 100%;

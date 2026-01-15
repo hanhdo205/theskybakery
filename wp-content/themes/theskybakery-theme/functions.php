@@ -91,9 +91,13 @@ function tsb_enqueue_scripts() {
     wp_enqueue_style('tsb-main', TSB_THEME_URI . '/assets/css/main.css', array('bootstrap'), TSB_THEME_VERSION);
     wp_enqueue_style('theskybakery-style', get_stylesheet_uri(), array('tsb-main'), TSB_THEME_VERSION);
 
-    // Product Detail CSS (only on single product pages)
-    if (is_product()) {
+    // Product Detail CSS (for all pages when WooCommerce is active)
+    if (class_exists('WooCommerce')) {
         wp_enqueue_style('tsb-product-detail', TSB_THEME_URI . '/assets/css/product-detail.css', array('tsb-main'), TSB_THEME_VERSION);
+    }
+
+    // Product Stars JS (only on single product pages)
+    if (is_product()) {
         wp_enqueue_script('tsb-product-stars', TSB_THEME_URI . '/assets/js/product-stars.js', array('jquery'), TSB_THEME_VERSION, true);
     }
 
