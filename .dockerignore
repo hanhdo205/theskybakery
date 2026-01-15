@@ -1,0 +1,33 @@
+# Git
+.git
+.gitignore
+
+# Docker
+docker-compose.yml
+.dockerignore
+Dockerfile
+
+# Documentation
+README.md
+README-DOCKER.md
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+debug.log
+
+# Cache
+wp-content/cache/
+
+# Backups
+*.bak
+*.backup

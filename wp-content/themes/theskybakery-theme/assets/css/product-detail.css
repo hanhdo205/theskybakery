@@ -1,0 +1,934 @@
+/**
+ * Product Detail Page Styles
+ * Bakery Theme - Beautiful & Modern Design
+ */
+
+/* ==================================================
+   STAR RATING - FONT AWESOME
+   ================================================== */
+.star-rating {
+    display: inline-flex !important;
+    gap: 4px;
+    font-size: 1em;
+    line-height: 1;
+    width: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    position: relative;
+}
+
+.star-rating i {
+    color: #ffa500;
+    line-height: 1;
+}
+
+.star-rating i.far {
+    color: #ddd;
+}
+
+/* Hide any pseudo-elements from WooCommerce */
+.star-rating::before,
+.star-rating span::before {
+    display: none !important;
+}
+
+.star-rating span {
+    display: none !important;
+}
+
+/* ==================================================
+   PRODUCT PAGE CONTAINER
+   ================================================== */
+.single-product-page {
+    background: #fff;
+}
+
+.single-product-container {
+    padding: 60px 0;
+}
+
+/* ==================================================
+   BREADCRUMB SECTION
+   ================================================== */
+.product-breadcrumb {
+    background: linear-gradient(135deg, #fff5e6 0%, #ffe8cc 100%);
+    padding: 20px 0;
+    margin-bottom: 40px;
+    border-bottom: 3px solid #ff9933;
+}
+
+.product-breadcrumb .woocommerce-breadcrumb {
+    color: #666;
+    font-size: 14px;
+}
+
+.product-breadcrumb .woocommerce-breadcrumb a {
+    color: #ff9933;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.product-breadcrumb .woocommerce-breadcrumb a:hover {
+    color: #e68a00;
+}
+
+/* ==================================================
+   PRODUCT MAIN SECTION - 2 COLUMN LAYOUT
+   ================================================== */
+.product-main-section {
+    margin-bottom: 60px;
+}
+
+.product-images-column {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+}
+
+/* Product Gallery */
+.woocommerce-product-gallery {
+    margin-bottom: 30px;
+}
+
+.woocommerce-product-gallery__image {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.woocommerce-product-gallery__image:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 35px rgba(255,153,51,0.2);
+}
+
+.woocommerce-product-gallery__image img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Gallery Thumbnails */
+.flex-control-thumbs {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.flex-control-thumbs li {
+    flex: 0 0 calc(25% - 8px);
+    list-style: none;
+}
+
+.flex-control-thumbs li img {
+    border-radius: 8px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.flex-control-thumbs li img:hover,
+.flex-control-thumbs li img.flex-active {
+    opacity: 1;
+    border-color: #ff9933;
+}
+
+/* ==================================================
+   PRODUCT SUMMARY - RIGHT COLUMN
+   ================================================== */
+.product-summary-column {
+    padding-left: 40px;
+}
+
+.product_title {
+    font-family: 'Bebas Neue', 'Oswald', sans-serif !important;
+    font-size: 42px !important;
+    color: #333 !important;
+    margin-bottom: 15px !important;
+    line-height: 1.2 !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px;
+}
+
+/* Stock Badge */
+.stock-badge {
+    display: inline-block;
+    padding: 8px 18px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.stock-badge.in-stock {
+    background: #d4edda;
+    color: #155724;
+}
+
+.stock-badge.out-of-stock {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.stock-badge i {
+    margin-right: 5px;
+}
+
+/* Product Meta */
+.product-meta-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 2px dashed #eee;
+}
+
+.product-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rating-count {
+    color: #666;
+    font-size: 14px;
+}
+
+.product-sku {
+    color: #999;
+    font-size: 13px;
+}
+
+/* Price */
+.price {
+    font-size: 36px !important;
+    color: #ff9933 !important;
+    font-weight: 700 !important;
+    margin-bottom: 25px !important;
+    font-family: 'Bebas Neue', sans-serif !important;
+}
+
+.price del {
+    color: #999 !important;
+    font-size: 28px !important;
+    margin-right: 15px;
+}
+
+.price ins {
+    text-decoration: none !important;
+}
+
+/* Short Description */
+.woocommerce-product-details__short-description {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #666;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-left: 4px solid #ff9933;
+    border-radius: 8px;
+}
+
+/* ==================================================
+   ADD TO CART SECTION
+   ================================================== */
+.cart {
+    background: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 3px 20px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
+}
+
+/* Quantity Input */
+.quantity {
+    display: inline-block;
+    margin-right: 15px;
+}
+
+.quantity input[type="number"] {
+    width: 80px;
+    height: 50px;
+    text-align: center;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    transition: border-color 0.3s;
+}
+
+.quantity input[type="number"]:focus {
+    border-color: #ff9933;
+    outline: none;
+}
+
+/* Add to Cart Button */
+.single_add_to_cart_button {
+    background: linear-gradient(135deg, #ff9933 0%, #ff6600 100%) !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 15px 45px !important;
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    transition: all 0.3s !important;
+    box-shadow: 0 4px 15px rgba(255,153,51,0.3) !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.single_add_to_cart_button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(255,153,51,0.4) !important;
+    background: linear-gradient(135deg, #ff6600 0%, #ff4400 100%) !important;
+}
+
+.single_add_to_cart_button:disabled {
+    background: #ccc !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+/* Product Features/Benefits */
+.product-features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+    background: #fff5e6;
+    border-radius: 10px;
+    transition: all 0.3s;
+}
+
+.feature-item:hover {
+    background: #ffe8cc;
+    transform: translateX(5px);
+}
+
+.feature-item i {
+    color: #ff9933;
+    font-size: 24px;
+}
+
+.feature-item span {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+}
+
+/* ==================================================
+   PRODUCT TABS
+   ================================================== */
+.woocommerce-tabs {
+    margin-top: 60px;
+    padding: 40px 0;
+    background: #f9f9f9;
+    border-radius: 15px;
+}
+
+.woocommerce-tabs .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 3px solid #ddd;
+    margin-bottom: 30px;
+    list-style: none;
+    padding: 0;
+}
+
+.woocommerce-tabs .tabs li {
+    flex: 1;
+    text-align: center;
+}
+
+.woocommerce-tabs .tabs li a {
+    display: block;
+    padding: 15px 30px;
+    background: #fff;
+    color: #666;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s;
+    border-radius: 10px 10px 0 0;
+}
+
+.woocommerce-tabs .tabs li.active a {
+    background: #ff9933;
+    color: #fff;
+}
+
+.woocommerce-tabs .tabs li a:hover {
+    background: #ffe8cc;
+    color: #ff9933;
+}
+
+.woocommerce-tabs .panel {
+    padding: 30px;
+    background: #fff;
+    border-radius: 0 0 10px 10px;
+}
+
+.woocommerce-tabs .panel h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* ==================================================
+   RELATED PRODUCTS
+   ================================================== */
+.related.products {
+    margin-top: 80px;
+    padding: 60px 0;
+    background: linear-gradient(135deg, #fff5e6 0%, #ffe8cc 100%);
+    border-radius: 20px;
+}
+
+.related.products h2 {
+    font-family: 'Bebas Neue', sans-serif !important;
+    font-size: 42px !important;
+    color: #333 !important;
+    text-align: center !important;
+    margin-bottom: 40px !important;
+    position: relative;
+}
+
+.related.products h2:after {
+    content: '';
+    display: block;
+    width: 100px;
+    height: 4px;
+    background: #ff9933;
+    margin: 15px auto 0;
+    border-radius: 2px;
+}
+
+.related.products .products {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+/* ==================================================
+   SALE BADGE
+   ================================================== */
+.onsale {
+    background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+    color: #fff !important;
+    padding: 15px 20px;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.2;
+    min-width: 80px;
+    min-height: 80px;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(255,68,68,0.4);
+    z-index: 9;
+}
+
+.onsale .sale-text {
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.onsale .sale-percentage {
+    font-size: 20px;
+    font-weight: 800;
+}
+
+/* ==================================================
+   BAKERY INFO TAB
+   ================================================== */
+.bakery-info-content h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.bakery-info-content > p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.bakery-features-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.bakery-features-list .feature-row {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    background: #fff5e6;
+    border-radius: 10px;
+    align-items: center;
+    transition: all 0.3s;
+}
+
+.bakery-features-list .feature-row:hover {
+    background: #ffe8cc;
+    transform: translateX(10px);
+}
+
+.bakery-features-list .feature-row i {
+    font-size: 32px;
+    color: #ff9933;
+    min-width: 40px;
+}
+
+.bakery-features-list .feature-row h4 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.bakery-features-list .feature-row p {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* ==================================================
+   CUSTOMER REVIEWS TAB
+   ================================================== */
+#reviews {
+    padding: 30px;
+}
+
+#reviews h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: #333;
+    margin-bottom: 25px;
+}
+
+/* Reviews List */
+.woocommerce-Reviews {
+    margin-bottom: 40px;
+}
+
+.woocommerce-Reviews-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.commentlist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.commentlist .review {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+}
+
+.commentlist .review:hover {
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    border-color: #ff9933;
+}
+
+/* Review Header */
+.commentlist .comment_container {
+    display: flex;
+    gap: 20px;
+}
+
+.commentlist .comment-text {
+    flex: 1;
+}
+
+.commentlist img.avatar {
+    border-radius: 50%;
+    border: 3px solid #ff9933;
+    width: 60px !important;
+    height: 60px !important;
+}
+
+.commentlist .meta {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.commentlist .woocommerce-review__author {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+}
+
+.commentlist .woocommerce-review__dash {
+    color: #999;
+}
+
+.commentlist .woocommerce-review__published-date {
+    color: #999;
+    font-size: 14px;
+}
+
+.commentlist .woocommerce-review__verified {
+    background: #d4edda;
+    color: #155724;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.commentlist .woocommerce-review__verified i {
+    margin-right: 3px;
+}
+
+/* Star Rating in Reviews */
+.commentlist .star-rating {
+    float: none !important;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.commentlist .star-rating i {
+    color: #ffa500;
+}
+
+.commentlist .star-rating i.far {
+    color: #ddd;
+}
+
+.commentlist .description {
+    line-height: 1.8;
+    color: #666;
+    margin-top: 15px;
+    font-size: 15px;
+}
+
+/* No Reviews Yet */
+.woocommerce-noreviews {
+    text-align: center;
+    padding: 40px;
+    background: #f9f9f9;
+    border-radius: 10px;
+    color: #999;
+    font-size: 16px;
+}
+
+/* Review Form */
+#review_form_wrapper {
+    background: #f9f9f9;
+    padding: 30px;
+    border-radius: 12px;
+    margin-top: 40px;
+}
+
+#review_form_wrapper #reply-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+#review_form_wrapper .comment-reply-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Star Rating Input */
+.tsb-comment-form-rating {
+    margin-bottom: 20px;
+}
+
+.tsb-comment-form-rating label {
+    display: block;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+/* Stars Input Container */
+.stars-input {
+    display: inline-flex;
+    gap: 5px;
+    font-size: 20px;
+}
+
+.stars-input .star-link {
+    text-decoration: none;
+    transition: all 0.3s;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.stars-input .star-link i {
+    color: #ddd;
+    transition: all 0.3s;
+}
+
+.stars-input .star-link i.fas {
+    color: #ffa500;
+}
+
+.stars-input .star-link:hover {
+    transform: scale(1.15);
+}
+
+.stars-input .star-link i.hover-fill {
+    color: #ffa500 !important;
+}
+
+.stars-input .star-link.selected i {
+    color: #ffa500;
+}
+
+/* Old stars class (hide default) */
+.stars {
+    display: none !important;
+}
+
+/* Hide default WooCommerce rating field if it appears */
+#respond p.comment-form-rating,
+.comment-form-rating:not(.tsb-comment-form-rating) {
+    display: none !important;
+}
+
+/* Review Form Fields */
+#review_form .comment-form-comment {
+    margin-bottom: 20px;
+}
+
+#review_form label {
+    display: block;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+#review_form textarea {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    line-height: 1.6;
+    resize: vertical;
+    min-height: 150px;
+    transition: border-color 0.3s;
+}
+
+#review_form textarea:focus {
+    border-color: #ff9933;
+    outline: none;
+}
+
+#review_form input[type="text"],
+#review_form input[type="email"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: border-color 0.3s;
+}
+
+#review_form input[type="text"]:focus,
+#review_form input[type="email"]:focus {
+    border-color: #ff9933;
+    outline: none;
+}
+
+/* Submit Button */
+#review_form .form-submit {
+    margin-top: 20px;
+}
+
+#review_form input[type="submit"] {
+    background: linear-gradient(135deg, #ff9933 0%, #ff6600 100%);
+    color: #fff;
+    border: none;
+    padding: 15px 40px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#review_form input[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255,153,51,0.4);
+    background: linear-gradient(135deg, #ff6600 0%, #ff4400 100%);
+}
+
+/* Review Form Notes */
+#review_form .comment-notes {
+    background: #fff5e6;
+    padding: 15px;
+    border-radius: 8px;
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+#review_form .comment-notes .required {
+    color: #ff0000;
+}
+
+/* Comment Form Author and Email */
+.comment-form-author,
+.comment-form-email {
+    margin-bottom: 20px;
+}
+
+/* Responsive Reviews */
+@media (max-width: 767px) {
+    .commentlist .comment_container {
+        flex-direction: column;
+    }
+
+    .commentlist img.avatar {
+        width: 50px !important;
+        height: 50px !important;
+    }
+
+    #reviews {
+        padding: 20px;
+    }
+
+    #review_form_wrapper {
+        padding: 20px;
+    }
+}
+
+/* ==================================================
+   SUCCESS MESSAGE
+   ================================================== */
+.woocommerce-message {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%) !important;
+    border-left: 4px solid #28a745 !important;
+    padding: 15px 20px !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 15px !important;
+}
+
+.woocommerce-message i {
+    font-size: 24px;
+    color: #28a745;
+}
+
+.woocommerce-message .button {
+    background: #28a745 !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 10px 25px !important;
+    border-radius: 5px !important;
+    margin-left: auto !important;
+}
+
+.woocommerce-message .button:hover {
+    background: #218838 !important;
+}
+
+/* ==================================================
+   RESPONSIVE DESIGN
+   ================================================== */
+@media (max-width: 991px) {
+    .product-summary-column {
+        padding-left: 0;
+        margin-top: 40px;
+    }
+
+    .product-images-column {
+        position: relative;
+        top: 0;
+    }
+
+    .product_title {
+        font-size: 32px !important;
+    }
+
+    .price {
+        font-size: 28px !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .product_title {
+        font-size: 28px !important;
+    }
+
+    .product-features {
+        grid-template-columns: 1fr;
+    }
+
+    .woocommerce-tabs .tabs {
+        flex-direction: column;
+    }
+
+    .woocommerce-tabs .tabs li a {
+        border-radius: 10px;
+        margin-bottom: 5px;
+    }
+
+    .related.products .products {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .related.products .products {
+        grid-template-columns: 1fr;
+    }
+
+    .single_add_to_cart_button {
+        width: 100%;
+        display: block;
+    }
+
+    .quantity {
+        display: block;
+        margin-bottom: 15px;
+        margin-right: 0;
+    }
+
+    .quantity input[type="number"] {
+        width: 100%;
+    }
+}

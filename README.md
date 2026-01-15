@@ -2,13 +2,28 @@
 
 Website WordPress cho The Sky Bakery.
 
-## Yêu cầu hệ thống
+## 🚀 Quick Start với Docker (Khuyến nghị)
+
+```bash
+git clone https://github.com/hanhdo205/theskybakery.git
+cd theskybakery
+docker compose up -d
+```
+
+Truy cập: http://localhost:8084
+
+📖 **Xem thêm:** [Quick Start Guide](docs/QUICK-START.md) | [Docker Setup](docs/README-DOCKER.md) | [HeidiSQL Setup](docs/HEIDISQL-SETUP.md)
+
+---
+
+## Yêu cầu hệ thống (Traditional setup)
 
 - PHP 7.4 trở lên
 - MySQL 5.7 trở lên
 - Apache/Nginx web server
+- Hoặc Docker (khuyến nghị)
 
-## Cài đặt
+## Cài đặt truyền thống
 
 1. Clone repository:
    ```bash

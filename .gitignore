@@ -1,6 +1,10 @@
 # WordPress config file (contains sensitive data)
 wp-config.php
 
+# Docker files
+.env
+docker-compose.override.yml
+
 # Debug log
 debug.log
 
@@ -24,3 +28,6 @@ Thumbs.db
 *.swp
 *.swo
 .claude/
+
+# Documentation
+docs/
