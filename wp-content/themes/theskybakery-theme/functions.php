@@ -153,6 +153,7 @@ add_action('widgets_init', 'tsb_widgets_init');
 /**
  * Include additional files
  */
+ 
 require_once TSB_THEME_DIR . '/inc/custom-post-types.php';
 require_once TSB_THEME_DIR . '/inc/customizer.php';
 require_once TSB_THEME_DIR . '/inc/woocommerce-functions.php';
@@ -192,5 +193,29 @@ add_filter('body_class', 'tsb_body_classes');
 function tsb_get_option($key, $default = '') {
     return get_theme_mod($key, $default);
 }
+
+add_filter( 'woocommerce_checkout_fields', 'wc_remove_checkout_fields', 1000, 1 ); 
+function wc_remove_checkout_fields( $fields ) {
+	
+	// Remove billing fields
+	unset( $fields['billing']['billing_company'] );
+    unset( $fields['billing']['billing_country'] );
+	unset( $fields['billing']['billing_city'] );
+	unset( $fields['billing']['billing_state']);
+    unset( $fields['billing']['billing_postcode']) ;	
+	// Remove shipping fields
+	unset( $fields['shipping']['shipping_company'] );
+    unset( $fields['shipping']['shipping_country'] ); 
+	unset( $fields['shipping']['shipping_city'] );
+	unset( $fields['shipping']['shipping_state']);
+    unset( $fields['shipping']['shipping_postcode']) ;	
+	
+	// Remove order notes
+    unset( $fields['order']['order_comments'] );
+
+    return $fields;
+}
+
+
 
 
