@@ -137,7 +137,7 @@ add_action('woocommerce_after_order_notes', 'tsb_add_pickup_location_field');
 function tsb_get_pickup_time_options() {
     $options = array('' => __('Select time', 'theskybakery'));
     
-    $start = 7; // 7 AM
+    $start = 8; // 7 AM
     $end = 17;  // 5 PM
     
     for ($hour = $start; $hour <= $end; $hour++) {
@@ -706,7 +706,7 @@ function tsb_checkout_pickup_date_script() {
         return;
     }
 
-    $min_date = date('Y-m-d', strtotime('+1 day'));
+    $min_date = date('Y-m-d', strtotime('+3 day'));
     ?>
     <style>
     /* Hide original input when flatpickr alt input is present */
