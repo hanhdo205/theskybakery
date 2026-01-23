@@ -730,14 +730,15 @@ function tsb_checkout_pickup_date_script() {
         outline: none;
         box-shadow: none;
     }
-    /* Move label up when has value */
-    .tsb-flatpickr-wrapper.has-date-value label {
-        transform: translateY(0) scale(0.75) !important;
-        top: 0.25rem !important;
-        left: 0.75rem !important;
-        background: transparent;
-        padding: 0;
-        color: #757575;
+    /* Move label up like select fields */
+    .tsb-flatpickr-wrapper.is-active label {
+        top: 0.25em !important;
+        line-height: 1.125 !important;
+    }
+    /* Placeholder styling */
+    .tsb-flatpickr-wrapper input::placeholder {
+        color: #1e1e1e !important;
+        opacity: 1 !important;
     }
     /* Flatpickr theme customization */
     .flatpickr-calendar {
@@ -746,6 +747,70 @@ function tsb_checkout_pickup_date_script() {
         box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         z-index: 9999 !important;
     }
+    .flatpickr-calendar .flatpickr-months {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    .flatpickr-calendar .flatpickr-month {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        color: #1e1e1e !important;
+    }
+    .flatpickr-calendar .flatpickr-current-month {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        color: #1e1e1e !important;
+        font-size: 1rem !important;
+        font-weight: 600;
+        width: 100% !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        height: auto !important;
+    }
+    .flatpickr-calendar .flatpickr-current-month span.cur-month {
+        display: inline-block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        color: #1e1e1e !important;
+        font-weight: 500 !important;
+        margin-right: 0 !important;
+    }
+    .flatpickr-calendar .flatpickr-current-month select.flatpickr-monthDropdown-months {
+        margin-right: 8px !important;
+    }
+    .flatpickr-calendar .flatpickr-current-month .numInputWrapper {
+        display: inline-block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        width: 60px !important;
+        min-width: 60px !important;
+        overflow: visible !important;
+        position: relative !important;
+        margin-left: 5px !important;
+    }
+    .flatpickr-calendar .flatpickr-current-month input.cur-year {
+        color: #1e1e1e !important;
+        font-size: 1rem !important;
+        font-weight: 600 !important;
+        width: 60px !important;
+        min-width: 60px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        background: transparent !important;
+        opacity: 1 !important;
+        -webkit-text-fill-color: #1e1e1e !important;
+        text-align: left !important;
+    }
+    .flatpickr-calendar .flatpickr-current-month .numInputWrapper span.arrowUp,
+    .flatpickr-calendar .flatpickr-current-month .numInputWrapper span.arrowDown {
+        display: none !important;
+    }
     .flatpickr-day.selected,
     .flatpickr-day.selected:hover {
         background: #000;
@@ -753,9 +818,6 @@ function tsb_checkout_pickup_date_script() {
     }
     .flatpickr-day:hover {
         background: #f0f0f0;
-    }
-    .flatpickr-current-month {
-        font-weight: 600;
     }
     </style>
     <script>
@@ -788,7 +850,9 @@ function tsb_checkout_pickup_date_script() {
                         // Style the alt input
                         if (instance.altInput && wrapper) {
                             instance.altInput.className = dateInput.className;
+                            instance.altInput.placeholder = '<?php _e("Select a pickup date", "theskybakery"); ?>';
                             wrapper.classList.add('tsb-flatpickr-wrapper');
+                            wrapper.classList.add('is-active');
                         }
                     },
                     onChange: function(selectedDates, dateStr, instance) {
