@@ -28,6 +28,21 @@ add_filter('woocommerce_enqueue_styles', function($enqueue_styles) {
 });
 
 /**
+ * Hide duplicate price in checkout order summary
+ */
+add_action('wp_head', function() {
+    if (is_checkout()) {
+        ?>
+        <style>
+        .wc-block-components-order-summary-item__individual-price {
+            display: none !important;
+        }
+        </style>
+        <?php
+    }
+});
+
+/**
  * Add custom wrapper
  */
 remove_action('woocommerce_before_main_content', 'woocommerce_output_content_wrapper', 10);
@@ -767,45 +782,34 @@ function tsb_checkout_pickup_date_script() {
         color: #1e1e1e !important;
         font-size: 1rem !important;
         font-weight: 600;
-        width: 100% !important;
-        padding: 0 !important;
-        overflow: visible !important;
-        height: auto !important;
+        padding: 14px 0 5px !important;
     }
-    .flatpickr-calendar .flatpickr-current-month span.cur-month {
+    .flatpickr-calendar .flatpickr-current-month span.cur-month,
+    .flatpickr-calendar .flatpickr-current-month select.flatpickr-monthDropdown-months,
+    .flatpickr-calendar .flatpickr-current-month .numInputWrapper,
+    .flatpickr-calendar .flatpickr-current-month input.cur-year {
         display: inline-block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
+        vertical-align: middle !important;
         color: #1e1e1e !important;
         font-weight: 500 !important;
-        margin-right: 0 !important;
     }
     .flatpickr-calendar .flatpickr-current-month select.flatpickr-monthDropdown-months {
         margin-right: 8px !important;
     }
     .flatpickr-calendar .flatpickr-current-month .numInputWrapper {
-        display: inline-block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        width: 60px !important;
-        min-width: 60px !important;
+        width: 50px !important;
         overflow: visible !important;
-        position: relative !important;
-        margin-left: 5px !important;
+        margin-left: 4px !important;
     }
     .flatpickr-calendar .flatpickr-current-month input.cur-year {
-        color: #1e1e1e !important;
         font-size: 1rem !important;
         font-weight: 600 !important;
-        width: 60px !important;
-        min-width: 60px !important;
+        width: 50px !important;
         padding: 0 !important;
         margin: 0 !important;
         border: none !important;
         background: transparent !important;
-        opacity: 1 !important;
         -webkit-text-fill-color: #1e1e1e !important;
-        text-align: left !important;
     }
     .flatpickr-calendar .flatpickr-current-month .numInputWrapper span.arrowUp,
     .flatpickr-calendar .flatpickr-current-month .numInputWrapper span.arrowDown {
