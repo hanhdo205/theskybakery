@@ -144,7 +144,7 @@ get_header();
 
                 <!-- View All Button -->
                 <div class="text-center mt-5">
-                    <a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>" class="btn btn-dark btn-lg btn-rounded">
+                    <a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>" class="btn btn-outline-primary">
                         View All Products
                     </a>
                 </div>

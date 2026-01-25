@@ -1307,7 +1307,13 @@ section {
 
     .header-cart {
         margin: 15px 0 0;
+		
     }
+	
+	.header-cart .fa-shopping-cart {
+		color:#e8a43a;
+		font-size: 22px;
+	}
 
     .slide-item img {
         height: 400px;
