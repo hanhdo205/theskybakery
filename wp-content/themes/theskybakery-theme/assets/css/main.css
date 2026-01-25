@@ -625,7 +625,7 @@ section {
 }
 
 
-.product-item .product-link a {
+.product-item .product-link a, .product-link a {
     background-image: url('../images/btn-bg.png');
     background-repeat: no-repeat;
     background-position: center center;
@@ -643,7 +643,7 @@ section {
 }
 
 
-.product-item .product-link a:after {
+.product-item .product-link a:after, .product-link a:after {
     content: "\f0f5";
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;

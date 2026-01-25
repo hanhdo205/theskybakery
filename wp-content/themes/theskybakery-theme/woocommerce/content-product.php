@@ -60,6 +60,9 @@ if (empty($product) || !$product->is_visible()) {
             <div class="product-price" style="font-weight: 600; color: var(--primary-color); font-size: 1.1rem;">
                 <?php woocommerce_template_loop_price(); ?>
             </div>
+			 <div class="product-link">
+				<a href="<?php echo esc_url($product->add_to_cart_url()); ?>" rel="nofollow" data-product_id="<?php echo esc_attr($product->get_id()); ?>" data-product_sku="" data-quantity="1" class="btn btn-cart add_to_cart_button product_type_simple">Add to cart</a>
+			</div>
         </div>
     </div>
 </li>

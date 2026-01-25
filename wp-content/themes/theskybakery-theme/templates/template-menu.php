@@ -11,11 +11,13 @@ get_header();
 <main id="primary" class="site-main menu-page">
     
     <!-- Page Header -->
+	<!--
     <section class="page-header">
         <div class="container">
-            <h1 class="page-title"><?php the_title(); ?></h1>
+            <h1 class="page-title"><?php //the_title(); ?></h1>
         </div>
     </section>
+	!-->
 
     <div class="container">
         <div class="row">

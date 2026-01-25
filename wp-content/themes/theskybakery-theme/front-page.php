@@ -153,17 +153,19 @@ get_header();
     </section>
 
     <!-- Custom Cake Builder CTA -->
+	<!--
     <section class="cake-builder-cta">
         <div class="container">
             <div class="cta-content text-center">
                 <h2>Design Your Perfect Cake</h2>
                 <p>Create a custom cake for your special occasion with our easy-to-use cake builder</p>
-                <a href="<?php echo esc_url(home_url('/cake-builder')); ?>" class="btn btn-primary btn-lg">
+                <a href="<?php //echo esc_url(home_url('/cake-builder')); ?>" class="btn btn-primary btn-lg">
                     <i class="fas fa-birthday-cake"></i> Start Building
                 </a>
             </div>
         </div>
     </section>
+	!-->
 
     <!-- Store Locations Preview -->
     <section class="stores-preview">
