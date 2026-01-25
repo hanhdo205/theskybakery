@@ -38,14 +38,11 @@ if (!defined('ABSPATH')) {
                         <div class="footer-social">
                             <h3>Follow The Sky Bakery</h3>
                             <p>On Social Networks</p>
-                            <div class="fb-buttons">
-                                <a href="<?php echo esc_url(tsb_get_option('social_facebook', 'https://facebook.com')); ?>" target="_blank" rel="noopener" class="fb-like-btn">
-                                    <i class="fab fa-facebook-f"></i> Like
-                                </a>
-                                <a href="<?php echo esc_url(tsb_get_option('social_facebook', 'https://facebook.com')); ?>" target="_blank" rel="noopener" class="fb-share-btn">
-                                    Share
-                                </a>
-                            </div>
+							
+							<div class="fb-buttons widget-content socialnetwork" style="overflow:hidden;">	 
+								<div class="fb-like" data-href="https://www.facebook.com/theskybakery/" data-layout="standard" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+
+							</div>
                             <p class="tagline">updated info everywhere</p>
                         </div>
                     </div>
