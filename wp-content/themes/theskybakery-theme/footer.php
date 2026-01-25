@@ -59,7 +59,25 @@ if (!defined('ABSPATH')) {
                 <div class="row align-items-center">
                     <div class="col-md-6">
                         <div class="footer-brand">
-                            <h4>The Sky Bakery</h4>
+                            <h4>The Sky Bakery And Patisserie</h4>
+							<style>
+									.cal_for_order {
+										display:none;
+									}
+
+									@media only screen and (max-width: 600px) {
+									.cal_for_order {
+										display:block;
+										font-size: 16px;
+										padding: 5px 0px 5px; 
+									}
+									}
+							</style>
+							<div class="cal_for_order">Call for Order: <br>- <span style='font-size: 13px'>Lakelands Shopping Center</span> <a href="tel:0895080751" style ='color: #fff;'>08 9508 0751</a> <br> - <span style ='font-size: 12px'>Mandurah Forum </span> <a href="tel:0895559397" style ='color: #fff;'>08 9555 9397</a>
+							<br> - <span style ='font-size: 12px'>Rockingham Center</span> <a href="tel:0895080750" style ='color: #fff;'>08 9508 0750</a>
+							<br> - <span style ='font-size: 12px'>Kwinana</span> <a href="tel:0862059984" style ='color: #fff;'>08 6205 9984</a>
+							<br> - <span style ='font-size: 12px'>Warnbro</span> <a href="tel:0861854883" style ='color: #fff;'>08 6185 4883</a>
+							</div>
                             <p class="copyright">
                                 <?php
                                 echo esc_html(tsb_get_option('copyright_text',
@@ -73,9 +91,9 @@ if (!defined('ABSPATH')) {
                     </div>
                     <div class="col-md-6">
                         <div class="footer-social-icons">
-                            <a href="<?php echo esc_url(tsb_get_option('social_facebook', 'https://facebook.com')); ?>" target="_blank" rel="noopener"><i class="fab fa-facebook-f"></i></a>
-                            <a href="<?php echo esc_url(tsb_get_option('social_instagram', 'https://instagram.com')); ?>" target="_blank" rel="noopener"><i class="fab fa-instagram"></i></a>
-                            <a href="mailto:<?php echo esc_attr(tsb_get_option('contact_email', 'info@theskybakery.com.au')); ?>"><i class="fas fa-envelope"></i></a>
+                            <a href="<?php echo esc_url(tsb_get_option('social_facebook', 'https://www.facebook.com/theskybakery/')); ?>" target="_blank" rel="noopener"><i class="fab fa-facebook-f"></i></a>
+                            <a href="<?php echo esc_url(tsb_get_option('social_instagram', 'https://www.instagram.com/theskybakery/')); ?>" target="_blank" rel="noopener"><i class="fab fa-instagram"></i></a>
+                            <a href="mailto:<?php echo esc_attr(tsb_get_option('contact_email', 'mailto:theskybakery@gmail.com')); ?>"><i class="fas fa-envelope"></i></a>
                         </div>
                     </div>
                 </div>

@@ -152,7 +152,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .navbar {
-    padding: 10px 15px;
+    padding: 5px 15px;
 }
 
 .navbar-brand {
@@ -1126,6 +1126,18 @@ section {
     margin-left: 5px;
 }
 
+
+@media screen and (max-width: 767px) {
+ 
+  .backtotop,#topcontrol 
+  {
+	  display:none;  
+  }
+  #topcontrol {
+	  display:none; 
+  }
+}
+
 /* ============================================
    Buttons
    ============================================ */
@@ -1405,7 +1417,7 @@ section {
     }
 
     .navbar-brand img {
-        max-height: 45px;
+        max-height: 52px;
     }
 
     .slide-item img {
