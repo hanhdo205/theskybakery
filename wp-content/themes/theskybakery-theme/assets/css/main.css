@@ -1218,8 +1218,8 @@ section {
    ============================================ */
 .page-header {
     background: var(--light-bg);
-    padding: 40px 0;
-    margin-bottom: 40px;
+    padding: 5px 0 !important;
+    margin-bottom: 0px;
 }
 
 .page-title {
@@ -1436,4 +1436,9 @@ section {
         padding: 12px 30px;
         font-size: 14px;
     }
+}
+
+.wc-block-cart__submit {
+	border: 3px solid #ff9933;
+	border-radius: 9px;
 }
