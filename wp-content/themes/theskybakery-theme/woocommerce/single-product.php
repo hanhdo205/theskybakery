@@ -60,47 +60,12 @@ get_header();
                          */
                         do_action('woocommerce_single_product_summary');
                         ?>
-
-                        <!-- Product Features -->
-                        <div class="product-features">
-                            <div class="feature-item">
-                                <i class="fas fa-shipping-fast"></i>
-                                <span><?php _e('Fast Delivery', 'theskybakery'); ?></span>
-                            </div>
-                            <div class="feature-item">
-                                <i class="fas fa-award"></i>
-                                <span><?php _e('Premium Quality', 'theskybakery'); ?></span>
-                            </div>
-                            <div class="feature-item">
-                                <i class="fas fa-leaf"></i>
-                                <span><?php _e('Fresh Ingredients', 'theskybakery'); ?></span>
-                            </div>
-                            <div class="feature-item">
-                                <i class="fas fa-shield-alt"></i>
-                                <span><?php _e('100% Guarantee', 'theskybakery'); ?></span>
-                            </div>
-                        </div>
-
                     </div><!-- .summary -->
                 </div>
 
             </div><!-- .row -->
 
-            <!-- Product Tabs & Related Products -->
-            <div class="row">
-                <div class="col-12">
-                    <?php
-                    /**
-                     * woocommerce_after_single_product_summary hook.
-                     *
-                     * @hooked woocommerce_output_product_data_tabs - 10
-                     * @hooked woocommerce_upsell_display - 15
-                     * @hooked woocommerce_output_related_products - 20
-                     */
-                    do_action('woocommerce_after_single_product_summary');
-                    ?>
-                </div>
-            </div>
+           
 
         </div><!-- .container -->
 

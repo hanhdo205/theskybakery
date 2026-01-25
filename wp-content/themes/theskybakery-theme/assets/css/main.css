@@ -601,7 +601,7 @@ section {
 
 .product-item .product-price .current-price {
     color: #fff;
-    font-size: 60px;
+    /*font-size: 60px;*/
     display: table-cell;
     vertical-align: middle;
 }
