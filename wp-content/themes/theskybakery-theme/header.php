@@ -44,13 +44,25 @@ if (!defined('ABSPATH')) {
                 </div>
                 <div class="col-lg-6">
                     <div class="top-bar-right">
+					    <div class="top-bar-right">
+                        <nav>
+							<ul class="top-menu">
+							   
+								<li><a href="<?php echo esc_url(home_url('/my-account')); ?>https://store.theskybakery.com.au/my-account/"><i class="fa fa-user"></i> My Account</a></li>
+							
+								<li><a href="<?php echo esc_url(home_url('/cart')); ?>"> <i class="fa fa-shopping-cart"></i>Cart</a></li>
+							</ul>
+						</nav>
+						</div>
                         <?php
+						/*
                         wp_nav_menu(array(
                             'theme_location' => 'top_menu',
                             'menu_class'     => 'top-menu',
                             'container'      => 'nav',
                             'fallback_cb'    => 'tsb_top_menu_fallback',
                         ));
+						*/
                         ?>
                     </div>
                 </div>
