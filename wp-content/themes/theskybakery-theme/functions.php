@@ -95,6 +95,8 @@ function tsb_enqueue_scripts() {
     if (class_exists('WooCommerce')) {
         wp_enqueue_style('tsb-product-detail', TSB_THEME_URI . '/assets/css/product-detail.css', array('tsb-main'), TSB_THEME_VERSION);
     }
+	wp_enqueue_style('woocommerce-layout', TSB_THEME_URI . '/assets/css/woocommerce-layout.css', array(), TSB_THEME_VERSION);
+
 
     // Product Stars JS (only on single product pages)
     if (is_product()) {

@@ -48,7 +48,7 @@ if (!defined('ABSPATH')) {
                         <nav>
 							<ul class="top-menu">
 							   
-								<li><a href="<?php echo esc_url(home_url('/my-account')); ?>https://store.theskybakery.com.au/my-account/"><i class="fa fa-user"></i> My Account</a></li>
+								<li><a href="<?php echo esc_url(home_url('/my-account')); ?>"><i class="fa fa-user"></i> My Account</a></li>
 							
 								<li><a href="<?php echo esc_url(home_url('/cart')); ?>"> <i class="fa fa-shopping-cart"></i>Cart</a></li>
 							</ul>

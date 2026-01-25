@@ -57,6 +57,8 @@ get_header();
                                 ));
                                 ?>
                             </div>
+							
+							<div style="clear:both"></div>
 
                         </article>
                     <?php
