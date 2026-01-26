@@ -44,6 +44,28 @@ add_filter('woocommerce_blocks_checkout_requires_shipping', '__return_false');
 add_filter('woocommerce_product_needs_shipping', '__return_false');
 
 /**
+ * ========================================
+ * AJAX HANDLER FOR PICKUP DATE
+ * ========================================
+ */
+
+/**
+ * Save pickup date to session via AJAX
+ */
+function tsb_save_pickup_date_ajax() {
+    $pickup_date = isset($_POST['pickup_date']) ? sanitize_text_field($_POST['pickup_date']) : '';
+
+    if (!empty($pickup_date)) {
+        WC()->session->set('tsb_pickup_date', $pickup_date);
+        wp_send_json_success(array('saved' => true, 'date' => $pickup_date));
+    } else {
+        wp_send_json_error(array('message' => 'No date provided'));
+    }
+}
+add_action('wp_ajax_tsb_save_pickup_date', 'tsb_save_pickup_date_ajax');
+add_action('wp_ajax_nopriv_tsb_save_pickup_date', 'tsb_save_pickup_date_ajax');
+
+/**
  * Disable default WooCommerce styles (but keep star rating font)
  */
 add_filter('woocommerce_enqueue_styles', function($enqueue_styles) {
@@ -266,6 +288,46 @@ function tsb_display_pickup_on_order($order) {
     }
 }
 add_action('woocommerce_admin_order_data_after_billing_address', 'tsb_display_pickup_on_order');
+
+/**
+ * Display pickup details on order received (thank you) page
+ */
+function tsb_display_pickup_on_thankyou($order_id) {
+    $order = wc_get_order($order_id);
+    if (!$order) return;
+
+    $location_id = $order->get_meta('_pickup_location');
+    $date = $order->get_meta('_pickup_date');
+    $time = $order->get_meta('_pickup_time');
+
+    if ($location_id || $date || $time) {
+        echo '<section class="woocommerce-pickup-details">';
+        echo '<h2>' . __('Pickup Details', 'theskybakery') . '</h2>';
+
+        if ($location_id) {
+            $store = get_post($location_id);
+            if ($store) {
+                $address = get_post_meta($location_id, '_store_address', true);
+                echo '<p><strong>' . __('Location:', 'theskybakery') . '</strong> ' . esc_html($store->post_title) . '</p>';
+                if ($address) {
+                    echo '<p><strong>' . __('Address:', 'theskybakery') . '</strong> ' . esc_html($address) . '</p>';
+                }
+            }
+        }
+
+        if ($date) {
+            echo '<p><strong>' . __('Date:', 'theskybakery') . '</strong> ' . date('F j, Y', strtotime($date)) . '</p>';
+        }
+
+        if ($time) {
+            echo '<p><strong>' . __('Time:', 'theskybakery') . '</strong> ' . date('g:i A', strtotime($time)) . '</p>';
+        }
+
+        echo '</section>';
+    }
+}
+add_action('woocommerce_thankyou', 'tsb_display_pickup_on_thankyou', 5);
+add_action('woocommerce_order_details_after_order_table', 'tsb_display_pickup_on_thankyou');
 
 /**
  * Add pickup details to order emails
@@ -783,10 +845,18 @@ function tsb_save_blocks_checkout_pickup_fields($order, $request) {
     $pickup_date = $additional_fields['theskybakery/pickup-date'] ?? '';
     $pickup_time = $additional_fields['theskybakery/pickup-time'] ?? '';
 
-    // Fallback: check extension data from theskybakery namespace
+    // Fallback 1: check extension data from theskybakery namespace
     if (empty($pickup_date) && isset($extensions['theskybakery']['pickup-date'])) {
         $pickup_date = $extensions['theskybakery']['pickup-date'];
         error_log('TSB Save - Got pickup_date from extensions: ' . $pickup_date);
+    }
+
+    // Fallback 2: check WooCommerce session
+    if (empty($pickup_date) && WC()->session) {
+        $pickup_date = WC()->session->get('tsb_pickup_date', '');
+        if (!empty($pickup_date)) {
+            error_log('TSB Save - Got pickup_date from session: ' . $pickup_date);
+        }
     }
 
     error_log('TSB Save - Final values - Location: ' . $pickup_location . ', Date: ' . $pickup_date . ', Time: ' . $pickup_time);
@@ -956,12 +1026,32 @@ function tsb_checkout_pickup_date_script() {
             // Store value globally
             window.tsbPickupDateValue = value;
 
-            // Try to update WooCommerce Blocks checkout store for additional fields
+            // Save to WooCommerce session via AJAX
+            var formData = new FormData();
+            formData.append('action', 'tsb_save_pickup_date');
+            formData.append('pickup_date', value);
+
+            fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    console.log('Pickup date saved to session:', data.data.date);
+                } else {
+                    console.log('Failed to save pickup date:', data);
+                }
+            })
+            .catch(function(error) {
+                console.log('AJAX error:', error);
+            });
+
+            // Also try WooCommerce Blocks store
             if (window.wp && window.wp.data) {
                 try {
                     var dispatch = window.wp.data.dispatch;
-
-                    // Try setExtensionData
                     var checkoutStore = dispatch('wc/store/checkout');
                     if (checkoutStore && typeof checkoutStore.setExtensionData === 'function') {
                         checkoutStore.setExtensionData('theskybakery', { 'pickup-date': value });
