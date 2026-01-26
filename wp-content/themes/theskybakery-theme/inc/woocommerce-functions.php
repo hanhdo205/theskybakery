@@ -773,6 +773,8 @@ function tsb_save_blocks_checkout_pickup_fields($order, $request) {
     $additional_fields = $request['additional_fields'] ?? array();
 
     // Log for debugging
+    error_log('=== TSB Save Pickup Fields ===');
+    error_log('TSB Save - Order ID: ' . $order->get_id());
     error_log('TSB Save - Extensions: ' . print_r($extensions, true));
     error_log('TSB Save - Additional Fields: ' . print_r($additional_fields, true));
 
@@ -787,15 +789,21 @@ function tsb_save_blocks_checkout_pickup_fields($order, $request) {
         error_log('TSB Save - Got pickup_date from extensions: ' . $pickup_date);
     }
 
+    error_log('TSB Save - Final values - Location: ' . $pickup_location . ', Date: ' . $pickup_date . ', Time: ' . $pickup_time);
+
     if (!empty($pickup_location)) {
         $order->update_meta_data('_pickup_location', absint($pickup_location));
     }
 
-    $order->update_meta_data('_pickup_date', sanitize_text_field($pickup_date));
+    if (!empty($pickup_date)) {
+        $order->update_meta_data('_pickup_date', sanitize_text_field($pickup_date));
+    }
 
     if (!empty($pickup_time)) {
         $order->update_meta_data('_pickup_time', sanitize_text_field($pickup_time));
     }
+
+    error_log('=== TSB Save Complete ===');
 }
 add_action('woocommerce_store_api_checkout_update_order_from_request', 'tsb_save_blocks_checkout_pickup_fields', 10, 2);
 
@@ -973,14 +981,33 @@ function tsb_checkout_pickup_date_script() {
                     'woocommerce_blocks_checkout_additional_fields_values',
                     'theskybakery',
                     function(additionalFields) {
+                        console.log('Hook called - additionalFields before:', JSON.stringify(additionalFields));
                         if (window.tsbPickupDateValue) {
                             additionalFields['theskybakery/pickup-date'] = window.tsbPickupDateValue;
                             console.log('Added pickup-date to checkout:', window.tsbPickupDateValue);
                         }
+                        console.log('Hook called - additionalFields after:', JSON.stringify(additionalFields));
                         return additionalFields;
                     }
                 );
-                console.log('TSB checkout hook registered');
+
+                // Also try to hook into the checkout submit
+                window.wp.hooks.addFilter(
+                    '__experimental_woocommerce_blocks_checkout_submit_data',
+                    'theskybakery',
+                    function(data) {
+                        console.log('Submit data hook called:', JSON.stringify(data));
+                        if (window.tsbPickupDateValue) {
+                            if (!data.extensions) data.extensions = {};
+                            if (!data.extensions.theskybakery) data.extensions.theskybakery = {};
+                            data.extensions.theskybakery['pickup-date'] = window.tsbPickupDateValue;
+                            console.log('Added to submit data extensions');
+                        }
+                        return data;
+                    }
+                );
+
+                console.log('TSB checkout hooks registered');
             }
         }
 
