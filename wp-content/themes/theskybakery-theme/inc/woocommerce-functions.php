@@ -632,10 +632,12 @@ function tsb_register_store_api_extension() {
                     ),
                 );
             },
+            'schema_type'     => 'ARRAY',
         )
     );
 }
 add_action('woocommerce_blocks_loaded', 'tsb_register_store_api_extension');
+
 
 /**
  * Register pickup fields for WooCommerce Blocks Checkout
@@ -785,34 +787,6 @@ function tsb_save_blocks_checkout_pickup_fields($order, $request) {
         error_log('TSB Save - Got pickup_date from extensions: ' . $pickup_date);
     }
 
-    // Validate pickup date
-    if (empty($pickup_date)) {
-        throw new \Automattic\WooCommerce\StoreApi\Exceptions\RouteException(
-            'pickup_date_required',
-            __('Please select a pickup date.', 'theskybakery'),
-            400
-        );
-    }
-
-    $date_timestamp = strtotime($pickup_date);
-    $min_date = strtotime('+2 days midnight'); // At least 3 days from now
-
-    if ($date_timestamp === false) {
-        throw new \Automattic\WooCommerce\StoreApi\Exceptions\RouteException(
-            'pickup_date_invalid',
-            __('Invalid date format. Please select a valid date.', 'theskybakery'),
-            400
-        );
-    }
-
-    if ($date_timestamp < $min_date) {
-        throw new \Automattic\WooCommerce\StoreApi\Exceptions\RouteException(
-            'pickup_date_too_soon',
-            __('Pickup date must be at least 3 days from now.', 'theskybakery'),
-            400
-        );
-    }
-
     if (!empty($pickup_location)) {
         $order->update_meta_data('_pickup_location', absint($pickup_location));
     }
@@ -951,6 +925,16 @@ function tsb_checkout_pickup_date_script() {
     .flatpickr-day:hover {
         background: #f0f0f0;
     }
+    /* Pickup date validation error */
+    .tsb-pickup-validation-error {
+        color: #cc1818;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        margin-bottom: 0.5rem;
+    }
+    .tsb-pickup-validation-error p {
+        margin: 0;
+    }
     </style>
     <script>
     (function() {
@@ -1005,6 +989,98 @@ function tsb_checkout_pickup_date_script() {
             document.addEventListener('DOMContentLoaded', setupCheckoutHook);
         } else {
             setupCheckoutHook();
+        }
+
+        // Show validation error in WooCommerce style
+        function showValidationError(message) {
+            // Remove existing error
+            var existingError = document.querySelector('.tsb-pickup-validation-error');
+            if (existingError) {
+                existingError.remove();
+            }
+
+            // Find pickup date field wrapper
+            var pickupField = document.querySelector('.wc-block-components-text-input[class*="pickup-date"]');
+            if (!pickupField) {
+                pickupField = document.querySelector('[id*="pickup-date"]');
+                if (pickupField) {
+                    pickupField = pickupField.closest('.wc-block-components-text-input');
+                }
+            }
+
+            // Create error element
+            var errorDiv = document.createElement('div');
+            errorDiv.className = 'tsb-pickup-validation-error wc-block-components-validation-error';
+            errorDiv.setAttribute('role', 'alert');
+            errorDiv.innerHTML = '<p>' + message + '</p>';
+
+            // Insert error after the field
+            if (pickupField) {
+                pickupField.parentNode.insertBefore(errorDiv, pickupField.nextSibling);
+                pickupField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                // Fallback: show at top of checkout
+                var checkoutForm = document.querySelector('.wc-block-checkout__form');
+                if (checkoutForm) {
+                    checkoutForm.insertBefore(errorDiv, checkoutForm.firstChild);
+                }
+            }
+        }
+
+        // Clear validation error
+        function clearValidationError() {
+            var existingError = document.querySelector('.tsb-pickup-validation-error');
+            if (existingError) {
+                existingError.remove();
+            }
+        }
+
+        // Validate pickup date
+        function validatePickupDate() {
+            clearValidationError();
+
+            if (!window.tsbPickupDateValue) {
+                showValidationError('<?php _e("Please select a pickup date.", "theskybakery"); ?>');
+                return false;
+            }
+
+            var selectedDate = new Date(window.tsbPickupDateValue);
+            var minDate = new Date();
+            minDate.setDate(minDate.getDate() + 3);
+            minDate.setHours(0, 0, 0, 0);
+
+            if (selectedDate < minDate) {
+                showValidationError('<?php _e("Pickup date must be at least 3 days from now.", "theskybakery"); ?>');
+                return false;
+            }
+
+            return true;
+        }
+
+        // Client-side validation for pickup date
+        function setupValidation() {
+            // Intercept Place Order button click
+            document.addEventListener('click', function(e) {
+                var button = e.target.closest('.wc-block-components-checkout-place-order-button');
+                if (button) {
+                    if (!validatePickupDate()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return false;
+                    }
+                }
+            }, true);
+
+            console.log('TSB pickup date validation setup complete');
+        }
+
+        // Setup validation
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(setupValidation, 1000);
+            });
+        } else {
+            setTimeout(setupValidation, 1000);
         }
 
         function initFlatpickr() {
