@@ -50,7 +50,7 @@ add_filter('woocommerce_product_needs_shipping', '__return_false');
  */
 
 /**
- * Save pickup date to session via AJAX
+ * Save pickup date to session via AJAX (with cookie backup)
  */
 function tsb_save_pickup_date_ajax() {
     $pickup_date = isset($_POST['pickup_date']) ? sanitize_text_field($_POST['pickup_date']) : '';
@@ -58,23 +58,18 @@ function tsb_save_pickup_date_ajax() {
     error_log('TSB AJAX - Received pickup_date: ' . $pickup_date);
 
     if (!empty($pickup_date)) {
-        // Ensure WC session is available
-        if (!WC()->session) {
-            error_log('TSB AJAX - WC session not available, initializing...');
-            WC()->initialize_session();
-        }
+        // Method 1: Save to cookie (most reliable for Store API)
+        setcookie('tsb_pickup_date', $pickup_date, time() + HOUR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), false);
+        $_COOKIE['tsb_pickup_date'] = $pickup_date; // Also set in current request
+        error_log('TSB AJAX - Saved to cookie: ' . $pickup_date);
 
-        if (WC()->session) {
+        // Method 2: Try WC session
+        if (function_exists('WC') && WC()->session) {
             WC()->session->set('tsb_pickup_date', $pickup_date);
             error_log('TSB AJAX - Saved to session: ' . $pickup_date);
-            error_log('TSB AJAX - Session value: ' . WC()->session->get('tsb_pickup_date'));
-            wp_send_json_success(array('saved' => true, 'date' => $pickup_date));
-        } else {
-            error_log('TSB AJAX - Could not initialize session');
-            // Fallback: save to transient
-            set_transient('tsb_pickup_date_' . WC()->session->get_customer_id(), $pickup_date, HOUR_IN_SECONDS);
-            wp_send_json_success(array('saved' => true, 'date' => $pickup_date, 'method' => 'transient'));
         }
+
+        wp_send_json_success(array('saved' => true, 'date' => $pickup_date));
     } else {
         wp_send_json_error(array('message' => 'No date provided'));
     }
@@ -855,6 +850,7 @@ function tsb_save_blocks_checkout_pickup_fields($order, $request) {
     error_log('TSB Save - Order ID: ' . $order->get_id());
     error_log('TSB Save - Extensions: ' . print_r($extensions, true));
     error_log('TSB Save - Additional Fields: ' . print_r($additional_fields, true));
+    error_log('TSB Save - Cookie: ' . (isset($_COOKIE['tsb_pickup_date']) ? $_COOKIE['tsb_pickup_date'] : 'NOT SET'));
 
     // Get values from additional fields
     $pickup_location = $additional_fields['theskybakery/pickup-location'] ?? '';
@@ -867,25 +863,17 @@ function tsb_save_blocks_checkout_pickup_fields($order, $request) {
         error_log('TSB Save - Got pickup_date from extensions: ' . $pickup_date);
     }
 
-    // Fallback 2: check WooCommerce session
-    if (empty($pickup_date) && WC()->session) {
+    // Fallback 2: check cookie (most reliable with Store API)
+    if (empty($pickup_date) && isset($_COOKIE['tsb_pickup_date']) && !empty($_COOKIE['tsb_pickup_date'])) {
+        $pickup_date = sanitize_text_field($_COOKIE['tsb_pickup_date']);
+        error_log('TSB Save - Got pickup_date from cookie: ' . $pickup_date);
+    }
+
+    // Fallback 3: check WooCommerce session
+    if (empty($pickup_date) && function_exists('WC') && WC()->session) {
         $pickup_date = WC()->session->get('tsb_pickup_date', '');
         if (!empty($pickup_date)) {
             error_log('TSB Save - Got pickup_date from session: ' . $pickup_date);
-            // Clear session after getting value
-            WC()->session->set('tsb_pickup_date', '');
-        }
-    }
-
-    // Fallback 3: check transient
-    if (empty($pickup_date) && WC()->session) {
-        $customer_id = WC()->session->get_customer_id();
-        if ($customer_id) {
-            $pickup_date = get_transient('tsb_pickup_date_' . $customer_id);
-            if (!empty($pickup_date)) {
-                error_log('TSB Save - Got pickup_date from transient: ' . $pickup_date);
-                delete_transient('tsb_pickup_date_' . $customer_id);
-            }
         }
     }
 
@@ -897,10 +885,17 @@ function tsb_save_blocks_checkout_pickup_fields($order, $request) {
 
     if (!empty($pickup_date)) {
         $order->update_meta_data('_pickup_date', sanitize_text_field($pickup_date));
+        // Clear cookie after saving
+        setcookie('tsb_pickup_date', '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN);
     }
 
     if (!empty($pickup_time)) {
         $order->update_meta_data('_pickup_time', sanitize_text_field($pickup_time));
+    }
+
+    // Clear session after saving
+    if (function_exists('WC') && WC()->session) {
+        WC()->session->set('tsb_pickup_date', '');
     }
 
     error_log('=== TSB Save Complete ===');
@@ -1056,7 +1051,13 @@ function tsb_checkout_pickup_date_script() {
             // Store value globally
             window.tsbPickupDateValue = value;
 
-            // Save to WooCommerce session via AJAX
+            // Method 1: Set cookie directly in browser (most reliable)
+            var expires = new Date();
+            expires.setTime(expires.getTime() + (1 * 60 * 60 * 1000)); // 1 hour
+            document.cookie = 'tsb_pickup_date=' + encodeURIComponent(value) + ';expires=' + expires.toUTCString() + ';path=/';
+            console.log('Pickup date saved to cookie:', value);
+
+            // Method 2: Save via AJAX (backup)
             var formData = new FormData();
             formData.append('action', 'tsb_save_pickup_date');
             formData.append('pickup_date', value);
@@ -1069,7 +1070,7 @@ function tsb_checkout_pickup_date_script() {
             .then(function(response) { return response.json(); })
             .then(function(data) {
                 if (data.success) {
-                    console.log('Pickup date saved to session:', data.data.date);
+                    console.log('Pickup date saved via AJAX:', data.data.date);
                 } else {
                     console.log('Failed to save pickup date:', data);
                 }
@@ -1078,7 +1079,7 @@ function tsb_checkout_pickup_date_script() {
                 console.log('AJAX error:', error);
             });
 
-            // Also try WooCommerce Blocks store
+            // Method 3: Try WooCommerce Blocks store
             if (window.wp && window.wp.data) {
                 try {
                     var dispatch = window.wp.data.dispatch;
@@ -1093,49 +1094,45 @@ function tsb_checkout_pickup_date_script() {
             }
         }
 
-        // Hook into checkout submission to ensure our data is included
-        function setupCheckoutHook() {
-            if (window.wp && window.wp.hooks && window.wp.hooks.addFilter) {
-                // Add filter to modify checkout data before submission
-                window.wp.hooks.addFilter(
-                    'woocommerce_blocks_checkout_additional_fields_values',
-                    'theskybakery',
-                    function(additionalFields) {
-                        console.log('Hook called - additionalFields before:', JSON.stringify(additionalFields));
-                        if (window.tsbPickupDateValue) {
-                            additionalFields['theskybakery/pickup-date'] = window.tsbPickupDateValue;
-                            console.log('Added pickup-date to checkout:', window.tsbPickupDateValue);
-                        }
-                        console.log('Hook called - additionalFields after:', JSON.stringify(additionalFields));
-                        return additionalFields;
-                    }
-                );
+        // Intercept fetch to add pickup date to checkout API request
+        function setupFetchIntercept() {
+            var originalFetch = window.fetch;
+            window.fetch = function(url, options) {
+                // Check if this is a checkout API request
+                if (url && typeof url === 'string' && url.includes('/wc/store/v1/checkout')) {
+                    console.log('Intercepted checkout API request');
 
-                // Also try to hook into the checkout submit
-                window.wp.hooks.addFilter(
-                    '__experimental_woocommerce_blocks_checkout_submit_data',
-                    'theskybakery',
-                    function(data) {
-                        console.log('Submit data hook called:', JSON.stringify(data));
-                        if (window.tsbPickupDateValue) {
-                            if (!data.extensions) data.extensions = {};
-                            if (!data.extensions.theskybakery) data.extensions.theskybakery = {};
-                            data.extensions.theskybakery['pickup-date'] = window.tsbPickupDateValue;
-                            console.log('Added to submit data extensions');
-                        }
-                        return data;
-                    }
-                );
+                    if (options && options.body && window.tsbPickupDateValue) {
+                        try {
+                            var body = JSON.parse(options.body);
 
-                console.log('TSB checkout hooks registered');
-            }
+                            // Add to extensions
+                            if (!body.extensions) body.extensions = {};
+                            if (!body.extensions.theskybakery) body.extensions.theskybakery = {};
+                            body.extensions.theskybakery['pickup-date'] = window.tsbPickupDateValue;
+
+                            // Also add to additional_fields if it exists
+                            if (!body.additional_fields) body.additional_fields = {};
+                            body.additional_fields['theskybakery/pickup-date'] = window.tsbPickupDateValue;
+
+                            options.body = JSON.stringify(body);
+                            console.log('Added pickup date to checkout request:', window.tsbPickupDateValue);
+                            console.log('Request body:', options.body);
+                        } catch(e) {
+                            console.log('Could not modify checkout request:', e);
+                        }
+                    }
+                }
+                return originalFetch.apply(this, arguments);
+            };
+            console.log('TSB fetch intercept registered');
         }
 
-        // Setup hook on load
+        // Setup fetch intercept on load
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', setupCheckoutHook);
+            document.addEventListener('DOMContentLoaded', setupFetchIntercept);
         } else {
-            setupCheckoutHook();
+            setupFetchIntercept();
         }
 
         // Show validation error in WooCommerce style
