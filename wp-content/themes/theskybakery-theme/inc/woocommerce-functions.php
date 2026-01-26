@@ -785,8 +785,33 @@ function tsb_save_blocks_checkout_pickup_fields($order, $request) {
         error_log('TSB Save - Got pickup_date from extensions: ' . $pickup_date);
     }
 
-    // Log pickup date for debugging (validation temporarily disabled)
-    error_log('TSB Save - Final pickup_date value: ' . $pickup_date);
+    // Validate pickup date
+    if (empty($pickup_date)) {
+        throw new \Automattic\WooCommerce\StoreApi\Exceptions\RouteException(
+            'pickup_date_required',
+            __('Please select a pickup date.', 'theskybakery'),
+            400
+        );
+    }
+
+    $date_timestamp = strtotime($pickup_date);
+    $min_date = strtotime('+2 days midnight'); // At least 3 days from now
+
+    if ($date_timestamp === false) {
+        throw new \Automattic\WooCommerce\StoreApi\Exceptions\RouteException(
+            'pickup_date_invalid',
+            __('Invalid date format. Please select a valid date.', 'theskybakery'),
+            400
+        );
+    }
+
+    if ($date_timestamp < $min_date) {
+        throw new \Automattic\WooCommerce\StoreApi\Exceptions\RouteException(
+            'pickup_date_too_soon',
+            __('Pickup date must be at least 3 days from now.', 'theskybakery'),
+            400
+        );
+    }
 
     if (!empty($pickup_location)) {
         $order->update_meta_data('_pickup_location', absint($pickup_location));
