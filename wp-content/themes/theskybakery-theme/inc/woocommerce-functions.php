@@ -55,9 +55,26 @@ add_filter('woocommerce_product_needs_shipping', '__return_false');
 function tsb_save_pickup_date_ajax() {
     $pickup_date = isset($_POST['pickup_date']) ? sanitize_text_field($_POST['pickup_date']) : '';
 
+    error_log('TSB AJAX - Received pickup_date: ' . $pickup_date);
+
     if (!empty($pickup_date)) {
-        WC()->session->set('tsb_pickup_date', $pickup_date);
-        wp_send_json_success(array('saved' => true, 'date' => $pickup_date));
+        // Ensure WC session is available
+        if (!WC()->session) {
+            error_log('TSB AJAX - WC session not available, initializing...');
+            WC()->initialize_session();
+        }
+
+        if (WC()->session) {
+            WC()->session->set('tsb_pickup_date', $pickup_date);
+            error_log('TSB AJAX - Saved to session: ' . $pickup_date);
+            error_log('TSB AJAX - Session value: ' . WC()->session->get('tsb_pickup_date'));
+            wp_send_json_success(array('saved' => true, 'date' => $pickup_date));
+        } else {
+            error_log('TSB AJAX - Could not initialize session');
+            // Fallback: save to transient
+            set_transient('tsb_pickup_date_' . WC()->session->get_customer_id(), $pickup_date, HOUR_IN_SECONDS);
+            wp_send_json_success(array('saved' => true, 'date' => $pickup_date, 'method' => 'transient'));
+        }
     } else {
         wp_send_json_error(array('message' => 'No date provided'));
     }
@@ -327,7 +344,6 @@ function tsb_display_pickup_on_thankyou($order_id) {
     }
 }
 add_action('woocommerce_thankyou', 'tsb_display_pickup_on_thankyou', 5);
-add_action('woocommerce_order_details_after_order_table', 'tsb_display_pickup_on_thankyou');
 
 /**
  * Add pickup details to order emails
@@ -856,6 +872,20 @@ function tsb_save_blocks_checkout_pickup_fields($order, $request) {
         $pickup_date = WC()->session->get('tsb_pickup_date', '');
         if (!empty($pickup_date)) {
             error_log('TSB Save - Got pickup_date from session: ' . $pickup_date);
+            // Clear session after getting value
+            WC()->session->set('tsb_pickup_date', '');
+        }
+    }
+
+    // Fallback 3: check transient
+    if (empty($pickup_date) && WC()->session) {
+        $customer_id = WC()->session->get_customer_id();
+        if ($customer_id) {
+            $pickup_date = get_transient('tsb_pickup_date_' . $customer_id);
+            if (!empty($pickup_date)) {
+                error_log('TSB Save - Got pickup_date from transient: ' . $pickup_date);
+                delete_transient('tsb_pickup_date_' . $customer_id);
+            }
         }
     }
 
