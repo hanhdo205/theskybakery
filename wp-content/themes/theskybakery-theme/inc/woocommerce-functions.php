@@ -629,11 +629,13 @@ function tsb_register_checkout_pickup_fields() {
 
     // Register Pickup Date field (text field, converted to date picker via JS)
 	$date_options = array();
+	
 	$min_date = date('Y-m-d', strtotime('+3 day'));
 	$date_options[] = array(
                 'value' => $min_date,
                 'label' => $min_date,
             );
+	
     woocommerce_register_additional_checkout_field(
         array(
             'id'       => 'theskybakery/pickup-date',
@@ -691,6 +693,7 @@ function tsb_save_blocks_checkout_pickup_fields($order, $request) {
     // Get values from additional fields
     $pickup_location = $additional_fields['theskybakery/pickup-location'] ?? '';
     $pickup_date = $additional_fields['theskybakery/pickup-date'] ?? '';
+	
     $pickup_time = $additional_fields['theskybakery/pickup-time'] ?? '';
 
     if (!empty($pickup_location)) {
@@ -776,14 +779,13 @@ function tsb_checkout_pickup_date_script() {
 				minDate: 3,
   				dateFormat: 'dd-mm-yy',
 				onSelect: function(datetext){
-					
+					jQuery('#order-theskybakery-pickup-date').find('option').remove().end();
 					jQuery('#order-theskybakery-pickup-date').append(jQuery('<option>', {
 						value: datetext,
 						text:  datetext
 					}));
 					jQuery('#order-theskybakery-pickup-date').val(datetext);
-					
-					//jQuery(this).val(datetext);
+					jQuery('.wc-block-components-form wc-block-checkout__form').load();
 					
 				},
 				beforeShowDay: NotBeforeToday 
