@@ -160,9 +160,10 @@ require_once TSB_THEME_DIR . '/inc/custom-post-types.php';
 require_once TSB_THEME_DIR . '/inc/customizer.php';
 require_once TSB_THEME_DIR . '/inc/woocommerce-functions.php';
 require_once TSB_THEME_DIR . '/inc/store-locations.php';
+/*
 require_once TSB_THEME_DIR . '/inc/pickup-scheduling.php';
 require_once TSB_THEME_DIR . '/inc/cake-builder.php';
-require_once TSB_THEME_DIR . '/inc/ajax-handlers.php';
+require_once TSB_THEME_DIR . '/inc/ajax-handlers.php';*/
 require_once TSB_THEME_DIR . '/inc/demo-import.php';
 
 /**
