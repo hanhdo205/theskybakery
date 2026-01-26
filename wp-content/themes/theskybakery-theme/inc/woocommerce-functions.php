@@ -662,8 +662,8 @@ function tsb_register_checkout_pickup_fields() {
 
     // Generate time slot options
     $time_options = array();
-    $start = 7; // 7 AM
-    $end = 17;  // 5 PM
+    $start = 9; // 7 AM
+    $end = 16;  // 5 PM
     for ($hour = $start; $hour <= $end; $hour++) {
         for ($min = 0; $min < 60; $min += 30) {
             $time = sprintf('%02d:%02d', $hour, $min);
