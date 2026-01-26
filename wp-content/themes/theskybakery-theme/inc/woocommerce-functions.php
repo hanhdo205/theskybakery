@@ -15,6 +15,35 @@ if (!class_exists('WooCommerce')) {
 }
 
 /**
+ * ========================================
+ * PICKUP ONLY STORE - DISABLE SHIPPING
+ * ========================================
+ */
+
+/**
+ * Disable shipping - all products are pickup only
+ */
+add_filter('woocommerce_cart_needs_shipping', '__return_false');
+
+/**
+ * Hide shipping fields in checkout
+ */
+add_filter('woocommerce_checkout_fields', function($fields) {
+    unset($fields['shipping']);
+    return $fields;
+});
+
+/**
+ * Remove shipping from checkout blocks
+ */
+add_filter('woocommerce_blocks_checkout_requires_shipping', '__return_false');
+
+/**
+ * Set all products as virtual (no shipping needed)
+ */
+add_filter('woocommerce_product_needs_shipping', '__return_false');
+
+/**
  * Disable default WooCommerce styles (but keep star rating font)
  */
 add_filter('woocommerce_enqueue_styles', function($enqueue_styles) {
@@ -106,7 +135,6 @@ function tsb_woocommerce_product_thumbnail() {
 /**
  * Add pickup location to checkout
  */
- /*
 function tsb_add_pickup_location_field($checkout) {
     $stores = tsb_get_stores();
     $options = array('' => __('Select pickup location', 'theskybakery'));
@@ -146,7 +174,6 @@ function tsb_add_pickup_location_field($checkout) {
     echo '</div>';
 }
 add_action('woocommerce_after_order_notes', 'tsb_add_pickup_location_field');
-*/
 
 /**
  * Get pickup time options
@@ -580,6 +607,37 @@ function tsb_add_rating_field() {
  */
 
 /**
+ * Register Store API extension for pickup data
+ */
+function tsb_register_store_api_extension() {
+    if (!function_exists('woocommerce_store_api_register_endpoint_data')) {
+        return;
+    }
+
+    woocommerce_store_api_register_endpoint_data(
+        array(
+            'endpoint'        => \Automattic\WooCommerce\StoreApi\Schemas\V1\CheckoutSchema::IDENTIFIER,
+            'namespace'       => 'theskybakery',
+            'data_callback'   => function() {
+                return array(
+                    'pickup-date' => '',
+                );
+            },
+            'schema_callback' => function() {
+                return array(
+                    'pickup-date' => array(
+                        'description' => __('Pickup date', 'theskybakery'),
+                        'type'        => 'string',
+                        'context'     => array('view', 'edit'),
+                    ),
+                );
+            },
+        )
+    );
+}
+add_action('woocommerce_blocks_loaded', 'tsb_register_store_api_extension');
+
+/**
  * Register pickup fields for WooCommerce Blocks Checkout
  */
 function tsb_register_checkout_pickup_fields() {
@@ -602,8 +660,8 @@ function tsb_register_checkout_pickup_fields() {
 
     // Generate time slot options
     $time_options = array();
-    $start = 9; // 9 AM
-    $end = 16;  // 4 PM
+    $start = 7; // 7 AM
+    $end = 17;  // 5 PM
     for ($hour = $start; $hour <= $end; $hour++) {
         for ($min = 0; $min < 60; $min += 30) {
             $time = sprintf('%02d:%02d', $hour, $min);
@@ -614,7 +672,7 @@ function tsb_register_checkout_pickup_fields() {
             );
         }
     }
-    
+
     // Register Pickup Location field
     woocommerce_register_additional_checkout_field(
         array(
@@ -628,25 +686,18 @@ function tsb_register_checkout_pickup_fields() {
     );
 
     // Register Pickup Date field (text field, converted to date picker via JS)
-	$date_options = array();
-	
-	$min_date = date('Y-m-d', strtotime('+3 day'));
-	$date_options[] = array(
-                'value' => $min_date,
-                'label' => $min_date,
-            );
-	
+    // Note: required is false to avoid WooCommerce's built-in validation issue with flatpickr
+    // We validate manually via extension data
     woocommerce_register_additional_checkout_field(
         array(
-            'id'       => 'theskybakery/pickup-date',
-            'label'    => __('Pickup Date', 'theskybakery'),
-            'location' => 'order',
-			'class'    => 'order_pickup_date',
-            'type'     => 'select',
-            'required' => true,
-			'options'  => $date_options,
+            'id'                => 'theskybakery/pickup-date',
+            'label'             => __('Pickup Date', 'theskybakery'),
+            'location'          => 'order',
+            'type'              => 'text',
+            'required'          => false,
+            'sanitize_callback' => 'tsb_sanitize_pickup_date',
         )
-    );	
+    );
 
     // Register Pickup Time field
     woocommerce_register_additional_checkout_field(
@@ -664,24 +715,53 @@ add_action('woocommerce_blocks_loaded', 'tsb_register_checkout_pickup_fields');
 add_action('woocommerce_init', 'tsb_register_checkout_pickup_fields');
 
 /**
- * Validate pickup date (must be at least tomorrow)
+ * Sanitize pickup date field
  */
-function tsb_validate_pickup_date_field($errors, $field_id, $field_value) {
-    if ('theskybakery/pickup-date' === $field_id) {
-        if (empty($field_value)) {
-            $errors->add('pickup_date_required', __('Please select a pickup date.', 'theskybakery'));
-        } else {
-            $pickup_date = strtotime($field_value);
-            $tomorrow = strtotime('tomorrow');
+function tsb_sanitize_pickup_date($value) {
+    // Log for debugging
+    error_log('TSB Pickup Date Sanitize - Raw value: ' . print_r($value, true));
 
-            if ($pickup_date < $tomorrow) {
-                $errors->add('pickup_date_invalid', __('Pickup date must be at least tomorrow.', 'theskybakery'));
-            }
-        }
+    if (empty($value)) {
+        return '';
     }
-    return $errors;
+
+    // Accept Y-m-d format
+    $value = sanitize_text_field($value);
+
+    // Try to parse the date
+    $timestamp = strtotime($value);
+    if ($timestamp !== false) {
+        return date('Y-m-d', $timestamp);
+    }
+
+    return $value;
 }
-add_filter('woocommerce_validate_additional_field', 'tsb_validate_pickup_date_field', 10, 3);
+
+/**
+ * Validate pickup date callback for field registration
+ */
+function tsb_validate_pickup_date_callback($value) {
+    // Log for debugging
+    error_log('TSB Pickup Date Validate Callback - Value: ' . print_r($value, true));
+
+    // Return true if valid, WP_Error if invalid
+    if (empty($value)) {
+        return new \WP_Error('pickup_date_required', __('Please select a pickup date.', 'theskybakery'));
+    }
+
+    $pickup_date = strtotime($value);
+    if ($pickup_date === false) {
+        return new \WP_Error('pickup_date_invalid', __('Please enter a valid date format.', 'theskybakery'));
+    }
+
+    $min_date = strtotime('+3 days');
+    if ($pickup_date < $min_date) {
+        return new \WP_Error('pickup_date_too_soon', __('Pickup date must be at least 3 days from now.', 'theskybakery'));
+    }
+
+    return true;
+}
+
 
 /**
  * Save pickup fields to order meta (for Blocks Checkout)
@@ -690,19 +770,46 @@ function tsb_save_blocks_checkout_pickup_fields($order, $request) {
     $extensions = $request['extensions'] ?? array();
     $additional_fields = $request['additional_fields'] ?? array();
 
+    // Log for debugging
+    error_log('TSB Save - Extensions: ' . print_r($extensions, true));
+    error_log('TSB Save - Additional Fields: ' . print_r($additional_fields, true));
+
     // Get values from additional fields
     $pickup_location = $additional_fields['theskybakery/pickup-location'] ?? '';
     $pickup_date = $additional_fields['theskybakery/pickup-date'] ?? '';
-	
     $pickup_time = $additional_fields['theskybakery/pickup-time'] ?? '';
+
+    // Fallback: check extension data from theskybakery namespace
+    if (empty($pickup_date) && isset($extensions['theskybakery']['pickup-date'])) {
+        $pickup_date = $extensions['theskybakery']['pickup-date'];
+        error_log('TSB Save - Got pickup_date from extensions: ' . $pickup_date);
+    }
+
+    // Validate pickup date
+    if (empty($pickup_date)) {
+        throw new \Automattic\WooCommerce\StoreApi\Exceptions\RouteException(
+            'pickup_date_required',
+            __('Please select a pickup date.', 'theskybakery'),
+            400
+        );
+    }
+
+    $date_timestamp = strtotime($pickup_date);
+    $min_date = strtotime('+2 days'); // Allow 2+ days
+
+    if ($date_timestamp === false || $date_timestamp < $min_date) {
+        throw new \Automattic\WooCommerce\StoreApi\Exceptions\RouteException(
+            'pickup_date_invalid',
+            __('Pickup date must be at least 3 days from now.', 'theskybakery'),
+            400
+        );
+    }
 
     if (!empty($pickup_location)) {
         $order->update_meta_data('_pickup_location', absint($pickup_location));
     }
 
-    if (!empty($pickup_date)) {
-        $order->update_meta_data('_pickup_date', sanitize_text_field($pickup_date));
-    }
+    $order->update_meta_data('_pickup_date', sanitize_text_field($pickup_date));
 
     if (!empty($pickup_time)) {
         $order->update_meta_data('_pickup_time', sanitize_text_field($pickup_time));
@@ -711,18 +818,18 @@ function tsb_save_blocks_checkout_pickup_fields($order, $request) {
 add_action('woocommerce_store_api_checkout_update_order_from_request', 'tsb_save_blocks_checkout_pickup_fields', 10, 2);
 
 /**
- * Enqueue Datepicker  for checkout date picker
+ * Enqueue Flatpickr for checkout date picker
  */
 function tsb_enqueue_checkout_datepicker() {
     if (!is_checkout()) {
         return;
     }
 
-    // Datepicker  CSS
-    wp_enqueue_style('Datepicker ', 'https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css', array(), '1.14.1');
+    // Flatpickr CSS
+    wp_enqueue_style('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css', array(), '4.6.13');
 
-    // Datepicker  JS
-    wp_enqueue_script('Datepicker ', 'https://code.jquery.com/ui/1.14.1/jquery-ui.js', array(), '1.14.1', true);
+    // Flatpickr JS
+    wp_enqueue_script('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr', array(), '4.6.13', true);
 }
 add_action('wp_enqueue_scripts', 'tsb_enqueue_checkout_datepicker');
 
@@ -735,64 +842,279 @@ function tsb_checkout_pickup_date_script() {
     }
 
     $min_date = date('Y-m-d', strtotime('+3 day'));
-	
-	
-    echo "<script type='text/javascript'>
-	    
-		function LastDayOfMonth(Year, Month) {  
-				//set next month first day
-				//substract one day from it.        
-				return new Date(new Date(Year, Month+1,1)-1).getDate(); 
-		}
+    ?>
+    <style>
+    /* Hide original input when flatpickr alt input is present */
+    .tsb-flatpickr-wrapper input[id*="pickup-date"].flatpickr-input {
+        display: none !important;
+    }
+    /* Style flatpickr alt input to match WooCommerce Blocks */
+    .tsb-flatpickr-wrapper input.form-control {
+        width: 100%;
+        height: auto;
+        padding: 1.5rem 1rem 0.5rem;
+        border: 1px solid #8d8d8d;
+        border-radius: 4px;
+        font-size: 1rem;
+        background: #fff;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+    .tsb-flatpickr-wrapper input.form-control:focus {
+        border-color: #000;
+        outline: none;
+        box-shadow: none;
+    }
+    /* Move label up like select fields */
+    .tsb-flatpickr-wrapper.is-active label {
+        top: 0.25em !important;
+        line-height: 1.125 !important;
+    }
+    /* Placeholder styling */
+    .tsb-flatpickr-wrapper input::placeholder {
+        color: #1e1e1e !important;
+        opacity: 1 !important;
+    }
+    /* Flatpickr theme customization */
+    .flatpickr-calendar {
+        font-family: inherit;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        z-index: 9999 !important;
+    }
+    .flatpickr-calendar .flatpickr-months {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    .flatpickr-calendar .flatpickr-month {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        color: #1e1e1e !important;
+    }
+    .flatpickr-calendar .flatpickr-current-month {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        color: #1e1e1e !important;
+        font-size: 1rem !important;
+        font-weight: 600;
+        padding: 14px 0 5px !important;
+    }
+    .flatpickr-calendar .flatpickr-current-month span.cur-month,
+    .flatpickr-calendar .flatpickr-current-month select.flatpickr-monthDropdown-months,
+    .flatpickr-calendar .flatpickr-current-month .numInputWrapper,
+    .flatpickr-calendar .flatpickr-current-month input.cur-year {
+        display: inline-block !important;
+        vertical-align: middle !important;
+        color: #1e1e1e !important;
+        font-weight: 500 !important;
+    }
+    .flatpickr-calendar .flatpickr-current-month select.flatpickr-monthDropdown-months {
+        margin-right: 8px !important;
+    }
+    .flatpickr-calendar .flatpickr-current-month .numInputWrapper {
+        width: 50px !important;
+        overflow: visible !important;
+        margin-left: 4px !important;
+    }
+    .flatpickr-calendar .flatpickr-current-month input.cur-year {
+        font-size: 1rem !important;
+        font-weight: 600 !important;
+        width: 50px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        background: transparent !important;
+        -webkit-text-fill-color: #1e1e1e !important;
+    }
+    .flatpickr-calendar .flatpickr-current-month .numInputWrapper span.arrowUp,
+    .flatpickr-calendar .flatpickr-current-month .numInputWrapper span.arrowDown {
+        display: none !important;
+    }
+    .flatpickr-day.selected,
+    .flatpickr-day.selected:hover {
+        background: #000;
+        border-color: #000;
+    }
+    .flatpickr-day:hover {
+        background: #f0f0f0;
+    }
+    </style>
+    <script>
+    (function() {
+        var currentDateInput = null;
+        var lastInitializedId = null;
 
-        function NotBeforeToday(date)
-		{
-			var now = new Date();//this gets the current date and time
-			
-			
-			
-			if (date.getMonth() == 11 && date.getDate() == 25)
-			   return [false];
-		   
-		    if (date.getMonth() == 3 && date.getDate() == 18)
-			   return [false];
-		   
-		    if (date.getMonth() == 3 && date.getDate() == 25)
-			   return [false];
-		   
-			if (date.getFullYear() == now.getFullYear() && date.getMonth() == now.getMonth() && date.getDate() > now.getDate()) 
-				return [true];
-			if (date.getFullYear() >= now.getFullYear() && date.getMonth() > now.getMonth())
-			   return [true];
-		   
-		   
-		   
-			 if (date.getFullYear() > now.getFullYear()) 
-			   return [true];
-			return [false]; 
-		}		
-	
-  		jQuery(function() {
-  			jQuery('.wc-block-components-select-input-theskybakery-pickup-date').datepicker({
-  				changeMonth: true,
-  				changeYear: true,
-				minDate: 3,
-  				dateFormat: 'dd-mm-yy',
-				onSelect: function(datetext){
-					jQuery('#order-theskybakery-pickup-date').find('option').remove().end();
-					jQuery('#order-theskybakery-pickup-date').append(jQuery('<option>', {
-						value: datetext,
-						text:  datetext
-					}));
-					jQuery('#order-theskybakery-pickup-date').val(datetext);
-					jQuery('.wc-block-components-form wc-block-checkout__form').load();
-					
-				},
-				beforeShowDay: NotBeforeToday 
-  			});
-  		});
-		</script>"; 
-    
-    
+        // Store the pickup date value globally so we can access it during checkout
+        window.tsbPickupDateValue = '';
+
+        function updateWooCommerceStore(fieldId, value) {
+            // Store value globally
+            window.tsbPickupDateValue = value;
+
+            // Try to update WooCommerce Blocks checkout store for additional fields
+            if (window.wp && window.wp.data) {
+                try {
+                    var dispatch = window.wp.data.dispatch;
+
+                    // Try setExtensionData
+                    var checkoutStore = dispatch('wc/store/checkout');
+                    if (checkoutStore && typeof checkoutStore.setExtensionData === 'function') {
+                        checkoutStore.setExtensionData('theskybakery', { 'pickup-date': value });
+                        console.log('Used setExtensionData:', fieldId, value);
+                    }
+                } catch(e) {
+                    console.log('Could not update WC store:', e);
+                }
+            }
+        }
+
+        // Hook into checkout submission to ensure our data is included
+        function setupCheckoutHook() {
+            if (window.wp && window.wp.hooks && window.wp.hooks.addFilter) {
+                // Add filter to modify checkout data before submission
+                window.wp.hooks.addFilter(
+                    'woocommerce_blocks_checkout_additional_fields_values',
+                    'theskybakery',
+                    function(additionalFields) {
+                        if (window.tsbPickupDateValue) {
+                            additionalFields['theskybakery/pickup-date'] = window.tsbPickupDateValue;
+                            console.log('Added pickup-date to checkout:', window.tsbPickupDateValue);
+                        }
+                        return additionalFields;
+                    }
+                );
+                console.log('TSB checkout hook registered');
+            }
+        }
+
+        // Setup hook on load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupCheckoutHook);
+        } else {
+            setupCheckoutHook();
+        }
+
+        function initFlatpickr() {
+            if (typeof flatpickr === 'undefined') {
+                setTimeout(initFlatpickr, 100);
+                return;
+            }
+
+            // Find the pickup date input field
+            var dateInput = document.querySelector('input[id*="pickup-date"]');
+            if (!dateInput) {
+                dateInput = document.querySelector('input[name*="pickup-date"]');
+            }
+
+            if (!dateInput) {
+                return;
+            }
+
+            // Get unique identifier for this input
+            var inputId = dateInput.id || dateInput.name || 'pickup-date';
+
+            // Skip if already initialized on this exact element
+            if (dateInput._flatpickr) {
+                return;
+            }
+
+            // Destroy old instance if input element changed
+            if (currentDateInput && currentDateInput !== dateInput && currentDateInput._flatpickr) {
+                currentDateInput._flatpickr.destroy();
+            }
+
+            currentDateInput = dateInput;
+            lastInitializedId = inputId;
+            var wrapper = dateInput.closest('.wc-block-components-text-input');
+
+            // Log input info for debugging
+            console.log('Flatpickr init on input:', dateInput.id, dateInput.name, dateInput);
+
+            var fp = flatpickr(dateInput, {
+                minDate: '<?php echo $min_date; ?>',
+                dateFormat: 'Y-m-d',
+                altInput: true,
+                altFormat: 'D, M j, Y',
+                disableMobile: true,
+                onReady: function(selectedDates, dateStr, instance) {
+                    if (instance.altInput && wrapper) {
+                        instance.altInput.className = dateInput.className;
+                        instance.altInput.placeholder = '<?php _e("Select a pickup date", "theskybakery"); ?>';
+                        wrapper.classList.add('tsb-flatpickr-wrapper');
+                        wrapper.classList.add('is-active');
+                    }
+                },
+                onChange: function(selectedDates, dateStr, instance) {
+                    if (!dateStr) return;
+
+                    // Add class to wrapper for label positioning
+                    if (wrapper) {
+                        wrapper.classList.add('is-active');
+                        wrapper.classList.add('has-date-value');
+                    }
+
+                    // Store value globally
+                    window.tsbPickupDateValue = dateStr;
+
+                    // Set value using native setter
+                    var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+                    nativeInputValueSetter.call(dateInput, dateStr);
+
+                    // Dispatch events
+                    dateInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    dateInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    dateInput.dispatchEvent(new Event('blur', { bubbles: true }));
+
+                    // Try WooCommerce store
+                    updateWooCommerceStore('theskybakery/pickup-date', dateStr);
+
+                    console.log('Pickup date set to:', dateStr, 'Input value:', dateInput.value, 'Global:', window.tsbPickupDateValue);
+                },
+                onClose: function(selectedDates, dateStr, instance) {
+                    // Trigger blur when calendar closes
+                    if (dateStr) {
+                        dateInput.dispatchEvent(new Event('blur', { bubbles: true }));
+                        dateInput.dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
+                    }
+                }
+            });
+        }
+
+        // Run on page load with delays for dynamic content
+        function scheduleInit() {
+            setTimeout(initFlatpickr, 300);
+            setTimeout(initFlatpickr, 800);
+            setTimeout(initFlatpickr, 1500);
+            setTimeout(initFlatpickr, 3000);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', scheduleInit);
+        } else {
+            scheduleInit();
+        }
+
+        // Observe DOM changes for dynamic loading (React re-renders)
+        var observer = new MutationObserver(function(mutations) {
+            // Check if our input still exists or was replaced
+            var dateInput = document.querySelector('input[id*="pickup-date"]');
+            if (dateInput && !dateInput._flatpickr) {
+                clearTimeout(window.tsbFlatpickrTimeout);
+                window.tsbFlatpickrTimeout = setTimeout(initFlatpickr, 150);
+            }
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    })();
+    </script>
+    <?php
 }
 add_action('wp_footer', 'tsb_checkout_pickup_date_script', 999);
