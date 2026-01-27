@@ -88,25 +88,6 @@ get_header();
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="col-lg-6">
-                            <div class="store-map">
-                                <?php if ($map_embed) : ?>
-                                    <?php echo $map_embed; ?>
-                                <?php else : ?>
-                                    <div class="map-placeholder">
-                                        <iframe 
-                                            src="https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=<?php echo urlencode($address); ?>" 
-                                            width="100%" 
-                                            height="300" 
-                                            style="border:0;" 
-                                            allowfullscreen="" 
-                                            loading="lazy">
-                                        </iframe>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                        </div>
                     </div>
                 </div>
             <?php
