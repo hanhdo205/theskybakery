@@ -199,3 +199,55 @@ function tsb_get_option($key, $default = '') {
 
 
 
+/* show column in orders */
+
+add_filter('woocommerce_shop_order_list_table_columns', 'add_order_additional_column', 20);
+function add_order_additional_column($columns) {
+	
+	
+	$new_columns = [];
+
+    foreach ( $columns as $key => $column ) {
+        $new_columns[ $key ] = $column;
+
+        // Add column after order status (you can change position)
+        if ( 'order_status' === $key ) {
+              $new_columns['pickup_date'] = __( 'Pickup Date', 'woocommerce' );
+			  $new_columns['pickup_time'] = __( 'Pickup Time', 'woocommerce' );
+			  $new_columns['pickup_location'] = __( 'Location', 'woocommerce' );
+        }
+    }
+	
+   
+    return $new_columns;
+   
+}
+
+add_action('woocommerce_shop_order_list_table_custom_column', 'render_order_additional_column', 10, 2);
+function render_order_additional_column($column, $order) {
+    
+	if ('pickup_date' === $column ) {
+        $pickup_date = $order->get_meta( '_pickup_date' );
+		echo $pickup_date ? esc_html( $pickup_date ) : '—';
+    }
+	
+		
+	if ($column=== 'pickup_time') {
+        $pickup_time = $order->get_meta( '_pickup_time' );
+		echo $pickup_time ? esc_html( $pickup_time ) : '—';
+    }
+	
+	if ($column=== 'pickup_location') {
+        $pickup_location = $order->get_meta( '_pickup_location' );
+		
+		if ($pickup_location) {	
+			$store = get_post($pickup_location);
+			echo esc_html($store->post_title);
+		}
+    }
+}
+
+
+
+
+

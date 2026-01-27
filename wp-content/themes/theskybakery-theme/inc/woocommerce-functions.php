@@ -100,8 +100,16 @@ add_action('wp_head', function() {
         .wc-block-components-order-summary-item__individual-price {
             display: none !important;
         }
+		
+		.wc-block-components-address-form__country{
+            display: none !important;
+        }
+		
+		.billing_hidden {
+			display: none !important;
+		}
         </style>
-        <?php
+	   <?php
     }
 });
 
