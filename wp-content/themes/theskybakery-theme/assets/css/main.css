@@ -766,8 +766,8 @@ section {
 }
 
 .store-name {
-    font-size: 24px;
-    color: var(--primary-color);
+    font-size: 24px !important;
+    color: #623a32;
     margin-bottom: 25px;
 }
 
